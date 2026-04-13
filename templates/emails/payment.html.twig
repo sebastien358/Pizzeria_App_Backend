@@ -1,0 +1,16 @@
+{% if firstname is defined and lastname is defined %}
+    <p>Bonjour {{ firstname }} {{ lastname }},</p>
+{% else %}
+    <p>Bonjour,</p>
+{% endif %}
+<p>Merci d'avoir passé commande chez nous !</p>
+<h2>Détails de votre commande :</h2>
+<ul>
+    {% for item in (commandItems is defined ? commandItems : items) %}
+        <li>{{ item.product.title }} (x{{ item.quantity }}) : {{ (item.price * item.quantity)|number_format(2, '.', ',') }} €</li>
+    {% endfor %}
+</ul>
+<p>Montant total : {{ totalAmount|number_format(2, '.', ',') }} €</p>
+<p>Vous serez informé de l'avancement de votre commande par email.</p>
+<p>Merci pour votre confiance et à bientôt !</p>
+<p>Cordialement,<br>[L'équipe de votre site]</p>
