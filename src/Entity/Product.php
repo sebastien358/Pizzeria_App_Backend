@@ -33,7 +33,7 @@ class Product
     #[Groups(['products', 'product'])]
     private Collection $productOption;
 
-    #[ORM\OneToMany(targetEntity: CommandItems::class, mappedBy: 'product', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: CommandItems::class, mappedBy: 'product', cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[Groups(['products', 'product'])]
     private Collection $commands;
 

@@ -99,6 +99,38 @@ class ProductAdminController extends AbstractController
         }
     }
 
+    #[Route('/product/add', methods: ['POST'])]
+    public function addProduct(Request $request): JsonResponse
+    {
+        try {
+            $user = $this->getUser();
+            if (!$user) {
+                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_FORBIDDEN);
+            }
+
+            $product = new Product();
+
+            $form = $this->createForm(ProductType::class, $product);
+
+            $data = $request->request->all();
+            $form->submit($data, false);
+
+            if (!$form->isValid()) {
+                $errors = $this->getErrorMessages($form);
+                return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+            }
+
+            $this->productService->handleProductImages($request, $product);
+
+            $this->entityManager->persist($product);
+            $this->entityManager->flush();
+
+            return $this->json(['message' => 'Produit ajouté avec succès'], Response::HTTP_CREATED);
+        } catch (\Throwable $e) {
+            $this->logger->error('Erreur lors de l\'ajout d\'un produit : ', ['error' => $e->getMessage()]);
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 
     #[Route('/product/edit/{id}', methods: ['POST'])]
     public function edit(int $id, Request $request): JsonResponse
@@ -107,7 +139,7 @@ class ProductAdminController extends AbstractController
             $user = $this->getUser();
 
             if (!$user) {
-                return $this->json(['error' => 'Utilisateur introuvable',], Response::HTTP_UNAUTHORIZED);
+                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
             }
 
             $product = $this->entityManager->getRepository(Product::class)->find($id);
@@ -118,16 +150,13 @@ class ProductAdminController extends AbstractController
 
             $form = $this->createForm(ProductType::class, $product);
 
-            $formData = $request->request->all();
-            $form->submit($formData);
+            $data = $request->request->all();
+            $form->submit($data, false);
 
             if (!$form->isValid()) {
                 $errors = $this->getErrorMessages($form);
-                return $this->json(['error' => $errors], Response::HTTP_BAD_REQUEST);
+                return $this->json($errors, Response::HTTP_BAD_REQUEST);
             }
-
-            $category = $form->get('category')->getData();
-            $product->setCategory($category);
 
             $this->productService->handleProductImages($request, $product);
 
@@ -140,53 +169,12 @@ class ProductAdminController extends AbstractController
         }
     }
 
-    #[Route('/product/add', methods: ['POST'])]
-    public function addProduct(Request $request): JsonResponse
-    {
-        try {
-            $user = $this->getUser();
-
-            if (!$user) {
-                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_FORBIDDEN);
-            }
-
-            $product = new Product();
-
-            $form = $this->createForm(ProductType::class, $product);
-            $data = $request->request->all();
-            $form->submit($data, false);
-
-            if (!$form->isValid()) {
-                $errors = $this->getErrorMessages($form);
-                return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
-            }
-
-            foreach ($data['productOption'] as $optionData) {
-                $option = new ProductOption();
-                $option->setName($optionData['name']);
-                $option->setPrice($optionData['price']);
-                $option->setProduct($product);
-                $this->entityManager->persist($option);
-            }
-
-            $this->productService->handleProductImages($request, $product);
-
-            $this->entityManager->persist($product);
-            $this->entityManager->flush();
-
-            return $this->json(['message' => 'Produit ajouté avec succès'], Response::HTTP_CREATED);
-        } catch (\Throwable $e) {
-            $this->logger->error('Erreur lors de l\'ajout d\'un produit', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-            return $this->json(['error' => 'Impossible d’ajouter le produit', 'details' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
 
     #[Route('/product/delete/{id}', methods: ['DELETE'])]
     public function deleteProduct(int $id): JsonResponse
     {
         try {
             $user = $this->getUser();
-
             if (!$user) {
                 return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_FORBIDDEN);
             }
@@ -197,7 +185,6 @@ class ProductAdminController extends AbstractController
             }
 
             $images = $product->getPictures();
-
             if ($images && !$images->isEmpty()) {
                 $this->fileUploader->removeProductImage($images);
             }
@@ -217,7 +204,6 @@ class ProductAdminController extends AbstractController
     {
         try {
             $user = $this->getUser();
-
             if (!$user) {
                 return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
             }
@@ -228,7 +214,6 @@ class ProductAdminController extends AbstractController
             }
 
             $imageCurrent = null;
-
             foreach ($product->getPictures() as $picture) {
                 if ($picture->getId() === $imageId) {
                     $imageCurrent = $picture;
@@ -241,7 +226,6 @@ class ProductAdminController extends AbstractController
             }
 
             $this->fileUploader->removeProductAdminImage($imageCurrent);
-
             $this->entityManager->flush();
 
             return $this->json(['success delete product' => Response::HTTP_OK]);
