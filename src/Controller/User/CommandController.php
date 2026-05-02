@@ -46,7 +46,7 @@ final class CommandController extends AbstractController
             }
 
             $page = (int) $request->query->get('page', 1);
-            $limit = (int) $request->query->get('limit', 5);
+            $limit = (int) $request->query->get('limit', 6);
 
             if ($page < 1 || $limit < 1) {
                 return $this->json(['error' => 'Données manquantes ou invalides'], Response::HTTP_BAD_REQUEST);
@@ -151,7 +151,7 @@ final class CommandController extends AbstractController
             $this->entityManager->flush();
 
             return $this->json([
-                'message' => 'Commande validée',
+                'success' => 'Commande réussie',
                 'commandId' => $command->getId()
             ], Response::HTTP_CREATED);
         } catch(\Throwable $e) {

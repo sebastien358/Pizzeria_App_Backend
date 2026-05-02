@@ -56,7 +56,9 @@ class ProductRepository extends ServiceEntityRepository
     public function findAllPrice(int $minPrice, int $maxPrice)
     {
         return $this->createQueryBuilder('p')
-            ->andWhere('p.price BETWEEN :minPrice AND :maxPrice')
+            ->join('p.productOption', 'po')
+            ->addSelect('po')
+            ->andWhere('po.price BETWEEN :minPrice AND :maxPrice')
             ->setParameter('minPrice', $minPrice)
             ->setParameter('maxPrice', $maxPrice)
             ->orderBy('p.id', 'DESC')

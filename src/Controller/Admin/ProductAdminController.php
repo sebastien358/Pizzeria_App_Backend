@@ -47,7 +47,7 @@ class ProductAdminController extends AbstractController
             }
 
             $page = $request->query->getInt('page', 1);
-            $limit = $request->query->getInt('limit', 20);
+            $limit = $request->query->getInt('limit', 15);
 
             $page = (int) $page;
             $limit = (int) $limit;

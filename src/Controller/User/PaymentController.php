@@ -79,8 +79,6 @@ final class PaymentController extends AbstractController
 
             $totalAmountCents = (int) ($totalAmount * 100);
 
-            dd($totalAmount);
-
             $total = 100;
 
             $stripe = new \Stripe\StripeClient($this->keyPrivate);

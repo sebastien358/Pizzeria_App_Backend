@@ -80,6 +80,7 @@ final class HomeController extends AbstractController
             $products = $this->entityManager->getRepository(Product::class)->findAllPrice($minPrice, $maxPrice);
 
             $dataProducts = $this->productService->getProductData($request, $products, $serializer);
+
             return $this->json($dataProducts, Response::HTTP_OK);
         } catch (\Throwable $e) {
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
