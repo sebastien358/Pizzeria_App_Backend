@@ -22,10 +22,10 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[IsGranted('ROLE_ADMIN')]
 class ProductAdminController extends AbstractController
 {
-    private $entityManager;
-    private $fileUploader;
-    private $productService;
-    private $logger;
+    private EntityManagerInterface $entityManager;
+    private FileUploader $fileUploader;
+    private ProductService $productService;
+    private LoggerInterface $logger;
 
     public function __construct(
         EntityManagerInterface $entityManager, FileUploader $fileUploader, ProductService $productService, LoggerInterface $logger)
@@ -47,7 +47,7 @@ class ProductAdminController extends AbstractController
             }
 
             $page = $request->query->getInt('page', 1);
-            $limit = $request->query->getInt('limit', 15);
+            $limit = $request->query->getInt('limit', 8);
 
             $page = (int) $page;
             $limit = (int) $limit;

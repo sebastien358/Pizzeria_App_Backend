@@ -5,13 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ddaf4521-9ec5-4a69-80e9-26fd216d435a" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/Shop_App_Backend.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Shop_App_Backend.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Controller/Admin/ProductAdminController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/Admin/ProductAdminController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/HomeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/HomeController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/User/CommandController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/User/CommandController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/User/PaymentController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/User/PaymentController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Repository/ProductRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/ProductRepository.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -248,6 +243,8 @@
       <workItem from="1777475234356" duration="4000" />
       <workItem from="1777475251647" duration="660000" />
       <workItem from="1777635736850" duration="1895000" />
+      <workItem from="1777887654833" duration="2058000" />
+      <workItem from="1777988569848" duration="1225000" />
     </task>
     <servers />
   </component>
