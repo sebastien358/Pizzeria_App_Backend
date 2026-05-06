@@ -79,11 +79,11 @@ final class PaymentController extends AbstractController
 
             $totalAmountCents = (int) ($totalAmount * 100);
 
-            $total = 100;
+            //$total = 100;
 
             $stripe = new \Stripe\StripeClient($this->keyPrivate);
             $paymentIntent = $stripe->paymentIntents->create([
-                'amount' => $total,
+                'amount' => $totalAmountCents,
                 'currency' => 'eur',
                 'payment_method_data' => [
                     'type' => 'card',
