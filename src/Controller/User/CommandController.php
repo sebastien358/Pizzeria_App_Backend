@@ -151,9 +151,14 @@ final class CommandController extends AbstractController
             $this->entityManager->flush();
 
             return $this->json([
-                'success' => 'Commande réussie',
-                'commandId' => $command->getId()
-            ], Response::HTTP_CREATED);
+                'success' => true,
+                'message' => 'Commande créée avec succès',
+                'pendingCommand' => $command,
+            ], Response::HTTP_CREATED, [], [
+                'groups' => ['commands', 'commandItems'], 'circular_reference_handler' => function ($object) {
+                    return $object->getId();
+                }
+            ]);
         } catch(\Throwable $e) {
             $this->logger->error('Error commande : ', ['error' => $e->getMessage()]);
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
