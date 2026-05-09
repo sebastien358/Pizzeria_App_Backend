@@ -28,8 +28,8 @@ final class HomeController extends AbstractController
     public function list(Request $request, SerializerInterface $serializer): JsonResponse
     {
         try {
-            $offset = (int) $request->query->get('offset', 0);
-            $limit = (int) $request->query->get('limit', 20);
+            $offset = (int) $request->query->get('offset');
+            $limit = (int) $request->query->get('limit');
 
             $products = $this->entityManager->getRepository(Product::class)->findAllLoadProducts($offset, $limit);
 
