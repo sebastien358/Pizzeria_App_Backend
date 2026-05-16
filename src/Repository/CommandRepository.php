@@ -29,6 +29,16 @@ class CommandRepository extends ServiceEntityRepository
            ->getResult();
     }
 
+    public function findAllSearch(string $search)
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.firstName LIKE :search OR c.lastName LIKE :search OR c.city LIKE :search')
+            ->setParameter('search', '%'.$search.'%')
+            ->orderBy('c.id', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
     // --- Pour l'admin : toutes les commandes payées ---
 
     public function findAllPaidCommands(int $page, int $limit): array

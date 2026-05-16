@@ -16,6 +16,33 @@ class ContactRepository extends ServiceEntityRepository
         parent::__construct($registry, Contact::class);
     }
 
+    public function findAllContactsPagination(int $currentPage, int $limit)
+    {
+        return $this->createQueryBuilder('c')
+            ->setFirstResult(($currentPage - 1) * $limit)
+            ->setMaxResults($limit)
+            ->orderBy('c.id', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAllSearch(string $search)
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.firstname LIKE :search OR c.lastname LIKE :search OR c.email LIKE :search')
+            ->setParameter('search', '%' . $search . '%')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function countContacts()
+    {
+        return $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     //    /**
     //     * @return Contact[] Returns an array of Contact objects
     //     */

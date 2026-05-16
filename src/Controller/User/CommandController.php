@@ -45,8 +45,8 @@ final class CommandController extends AbstractController
                 return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
             }
 
-            $page = (int) $request->query->get('page', 1);
-            $limit = (int) $request->query->get('limit', 6);
+            $page = (int) $request->query->get('currentPage', 1);
+            $limit = (int) $request->query->get('limit');
 
             if ($page < 1 || $limit < 1) {
                 return $this->json(['error' => 'Données manquantes ou invalides'], Response::HTTP_BAD_REQUEST);

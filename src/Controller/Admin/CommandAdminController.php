@@ -41,11 +41,8 @@ class CommandAdminController extends AbstractController
                 return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
             }
 
-            $page = $request->query->get('page', 1);
-            $limit = $request->query->get('limit', 5);
-
-            $page = (int) $page;
-            $limit = (int) $limit;
+            $page = (int) $request->query->get('currentPage', 1);
+            $limit = (int) $request->query->get('limit');
 
             if (!number_format($page) || !number_format($limit)) {
                 return $this->json(['error' => 'Donneés manquantes'], Response::HTTP_BAD_REQUEST);
@@ -62,6 +59,30 @@ class CommandAdminController extends AbstractController
                 'pages' => ceil($total / $limit),
             ], Response::HTTP_OK);
 
+        } catch (\Throwable $e) {
+            $this->logger->error('Erreur de la récupération des commandes : ', ['error' => $e->getMessage()]);
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    #[Route('/search', methods: ['GET'])]
+    public function search(Request $request, SerializerInterface $serializer): JsonResponse
+    {
+        try {
+            $user = $this->getUser();
+            if (!$user) {
+                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
+            }
+
+            $search = (string) $request->query->get('search');
+            if (!$search) {
+                return $this->json(['error' => 'Donneés manquantes'], Response::HTTP_BAD_REQUEST);
+            }
+
+            $commands = $this->entityManager->getRepository(Command::class)->findAllSearch($search);
+            $dataCommands = $this->commandService->getCommandData($request, $commands, $serializer);
+
+            return $this->json($dataCommands, Response::HTTP_OK);
         } catch (\Throwable $e) {
             $this->logger->error('Erreur de la récupération des commandes : ', ['error' => $e->getMessage()]);
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);

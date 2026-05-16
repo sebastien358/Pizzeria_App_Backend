@@ -62,49 +62,4 @@ final class HomeController extends AbstractController
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-
-    #[Route('/filtered/price', methods: ['GET'])]
-    public function price(Request $request, SerializerInterface $serializer): JsonResponse
-    {
-        try {
-            $minPrice = $request->query->get('minPrice');
-            $maxPrice = $request->query->get('maxPrice');
-
-            if (!is_numeric($minPrice) || !is_numeric($maxPrice)) {
-                return $this->json(['error' => 'Paramètres minPrice et maxPrice obligatoires'], Response::HTTP_BAD_REQUEST);
-            }
-
-            $minPrice = (int) $minPrice;
-            $maxPrice = (int) $maxPrice;
-
-            $products = $this->entityManager->getRepository(Product::class)->findAllPrice($minPrice, $maxPrice);
-
-            $dataProducts = $this->productService->getProductData($request, $products, $serializer);
-
-            return $this->json($dataProducts, Response::HTTP_OK);
-        } catch (\Throwable $e) {
-            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    #[Route('/filtered/category', methods: ['GET'])]
-    public function category(Request $request, SerializerInterface $serializer): JsonResponse
-    {
-        try {
-            $category = $request->query->get('category');
-
-            if (!$category || !is_string($category)) {
-                return $this->json(['error' => 'Paramètre category obligatoire'], Response::HTTP_INTERNAL_SERVER_ERROR);
-            }
-
-            $category = trim((string) $category);
-
-            $products = $this->entityManager->getRepository(Product::class)->findAllCategory($category);
-            $dataProducts = $this->productService->getProductData($request, $products, $serializer);
-
-            return $this->json($dataProducts, Response::HTTP_OK);
-        } catch (\Throwable $e) {
-            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
 }

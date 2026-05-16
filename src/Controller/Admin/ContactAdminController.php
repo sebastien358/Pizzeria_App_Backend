@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -25,10 +26,59 @@ class ContactAdminController extends AbstractController
     }
 
     #[Route('/contact/list', methods: ['GET'])]
-    public function index(SerializerInterface $serializer): JsonResponse
+    public function index(Request $request, SerializerInterface $serializer): JsonResponse
     {
         try {
-            $contacts = $this->entityManager->getRepository(Contact::class)->findAll();
+            $user = $this->getUser();
+
+            if (!$user) {
+                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
+            }
+
+            $limit = (int) $request->query->get('limit');
+            $currentPage = (int) $request->query->get('currentPage');
+
+            if (!is_numeric($limit) || !is_numeric($currentPage)) {
+                return $this->json(['error' => 'Les données ne correspondent pas aux valeurs attendu'], Response::HTTP_BAD_REQUEST);
+            }
+
+            $contacts = $this->entityManager->getRepository(Contact::class)->findAllContactsPagination($currentPage, $limit);
+
+            $dataContacts = $serializer->normalize($contacts, 'json', ['groups' => ['contacts'],
+                'circular_reference_handler' => function ($object) {
+                    return $object->getId();
+                }
+            ]);
+
+            $totalContacts = $this->entityManager->getRepository(Contact::class)->countContacts();
+
+            return $this->json([
+                'contacts' => $dataContacts,
+                'totalContacts' => $totalContacts,
+                'pages' => ceil($totalContacts / $limit),
+            ], Response::HTTP_OK);
+        } catch(\Throwable $e) {
+            $this->logger->error('Impossible de récupérer la liste des messages', ['error' => $e->getMessage()]);
+            return $this->json(['error' => 'Impossible de récupérer la liste des messages'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    #[Route('/contact/search', methods: ['GET'])]
+    public function search(Request $request, SerializerInterface $serializer): JsonResponse
+    {
+        try {
+            $user = $this->getUser();
+
+            if (!$user) {
+                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
+            }
+
+            $search = (string) $request->query->get('search');
+            if (!is_string($search)) {
+                return $this->json(['message' => 'Données de recherches manquantes'], Response::HTTP_BAD_REQUEST);
+            }
+
+            $contacts = $this->entityManager->getRepository(Contact::class)->findAllSearch($search);
 
             $dataContacts = $serializer->normalize($contacts, 'json', ['groups' => ['contacts'],
                 'circular_reference_handler' => function ($object) {
@@ -37,9 +87,9 @@ class ContactAdminController extends AbstractController
             ]);
 
             return $this->json($dataContacts, Response::HTTP_OK);
-        } catch(\Throwable $e) {
-            $this->logger->error('Impossible de récupérer la liste des messages', ['error' => $e->getMessage()]);
-            return $this->json(['error' => 'Impossible de récupérer la liste des messages'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        } catch (\Throwable $e) {
+            $this->logger->error(' : ', [$e->getMessage()]);
+            return $this->json(['' => ''], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -47,11 +97,11 @@ class ContactAdminController extends AbstractController
     public function delete(int $id): JsonResponse
     {
         try {
-//            $user = $this->getUser();
-//
-//            if (!$user) {
-//                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
-//            }
+            $user = $this->getUser();
+
+            if (!$user) {
+                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
+            }
 
             $contact = $this->entityManager->getRepository(Contact::class)->find($id);
 

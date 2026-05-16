@@ -46,17 +46,14 @@ class ProductAdminController extends AbstractController
                 return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
             }
 
-            $page = $request->query->getInt('page', 1);
-            $limit = $request->query->getInt('limit', 8);
+            $currentPage = (int) $request->query->get('currentPage');
+            $limit = (int) $request->query->get('limit');
 
-            $page = (int) $page;
-            $limit = (int) $limit;
-
-            if (!number_format($page) || !number_format($limit)) {
+            if (!number_format($currentPage) || !number_format($limit)) {
                 return $this->json(['error' => 'Donneés manquantes'], Response::HTTP_BAD_REQUEST);
             }
 
-            $products = $this->entityManager->getRepository(Product::class)->findAllProductPerPageAdmin($page, $limit);
+            $products = $this->entityManager->getRepository(Product::class)->findAllProductPerPageAdmin($currentPage, $limit);
             if(!$products) {
                 return $this->json(['error' => 'Pas de produit'], Response::HTTP_BAD_REQUEST);
             }
@@ -65,7 +62,6 @@ class ProductAdminController extends AbstractController
             $dataProducts = $this->productService->getProductData($request, $products, $serializer);
 
             return $this->json([
-                'total' => $total,
                 'products' => $dataProducts,
                 'pages' => ceil($total / $limit)
             ], Response::HTTP_OK);
@@ -74,6 +70,32 @@ class ProductAdminController extends AbstractController
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    #[Route('/product/search', methods: ['GET'])]
+    public function search(Request $request, SerializerInterface $serializer): JsonResponse
+    {
+        try {
+            $user = $this->getUser();
+            if (!$user) {
+                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
+            }
+
+            $search = (string) $request->query->get('search');
+
+            if (!is_string($search)) {
+                return $this->json(['error' => 'Recherche invalide'], Response::HTTP_BAD_REQUEST);
+            }
+
+            $products = $this->entityManager->getRepository(Product::class)->findAllSearch($search);
+            $dataProducts = $this->productService->getProductData($request, $products, $serializer);
+
+            return $this->json($dataProducts, Response::HTTP_OK);
+        } catch(\Throwable $e) {
+            $this->logger->error('Erreur de la récupération des pizzas via l\'input search : ', [$e->getMessage()]);
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     #[Route('/product/current/{id}', methods: ['GET'])]
     public function current(int $id, Request $request, SerializerInterface $serializer): JsonResponse
     {
