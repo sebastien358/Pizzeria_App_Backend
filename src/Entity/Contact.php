@@ -27,7 +27,7 @@ class Contact
     #[Groups('contacts')]
     private ?string $email = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 1500)]
     #[Groups('contacts')]
     private ?string $message = null;
 
