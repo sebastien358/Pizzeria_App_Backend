@@ -49,10 +49,9 @@ class CommandAdminController extends AbstractController
             }
 
             $commands = $this->entityManager->getRepository(Command::class)->findAllPaidCommands($page, $limit);
-
-            $total = $this->entityManager->getRepository(Command::class)->findAllCountAdminCommands();
             $dataCommands = $this->commandService->getCommandData($request, $commands, $serializer);
 
+            $total = $this->entityManager->getRepository(Command::class)->findAllCountByStatus(Command::STATUS_PAID);
             return $this->json([
                 'total' => $total,
                 'commands' => $dataCommands,

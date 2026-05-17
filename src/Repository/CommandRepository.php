@@ -17,14 +17,14 @@ class CommandRepository extends ServiceEntityRepository
         parent::__construct($registry, Command::class);
     }
 
-    public function findAllCommandByClient(User $user, int $page, int $limit)
+    public function findAllCommandByClient(User $user, int $page, int $limit): array
     {
        return $this->createQueryBuilder('command')
            ->where('command.user = :user')
            ->setParameter('user', $user)
+           ->orderBy('command.createdAt', 'DESC')
            ->setFirstResult(($page - 1) * $limit)
            ->setMaxResults($limit)
-           ->orderBy('command.createdAt', 'DESC')
            ->getQuery()
            ->getResult();
     }
@@ -55,12 +55,14 @@ class CommandRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findAllCountAdminCommands()
+    public function findAllCountByStatus(string $status): int
     {
-        return $this->createQueryBuilder('command')
-            ->select('COUNT(command.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
+       return $this->createQueryBuilder('command')
+           ->select('count(command.id)')
+           ->where('command.status = :status')
+           ->setParameter('status', $status)
+           ->getQuery()
+           ->getSingleScalarResult();
     }
 
     public function findAllCountCommand(User $user)

@@ -33,7 +33,7 @@ final class PaymentController extends AbstractController
         $this->mailerProvider = $mailerProvider;
     }
 
-    #[Route('/api/payment', methods: ['POST'])]
+    #[Route('/api/paymen', methods: ['POST'])]
     public function payment(Request $request, LoggerInterface $logger): JsonResponse
     {
         try {
