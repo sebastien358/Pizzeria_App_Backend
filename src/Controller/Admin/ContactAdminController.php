@@ -53,6 +53,7 @@ class ContactAdminController extends AbstractController
             $totalContacts = $this->entityManager->getRepository(Contact::class)->countContacts();
 
             return $this->json([
+                'total' => (int) $totalContacts,
                 'contacts' => $dataContacts,
                 'totalContacts' => $totalContacts,
                 'pages' => ceil($totalContacts / $limit),
@@ -88,8 +89,8 @@ class ContactAdminController extends AbstractController
 
             return $this->json($dataContacts, Response::HTTP_OK);
         } catch (\Throwable $e) {
-            $this->logger->error(' : ', [$e->getMessage()]);
-            return $this->json(['' => ''], Response::HTTP_INTERNAL_SERVER_ERROR);
+            $this->logger->error('Error de la récupérations des contacts via input search : ', [$e->getMessage()]);
+            return $this->json(['message' => 'Error de la récupérations des contacts via input search'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 

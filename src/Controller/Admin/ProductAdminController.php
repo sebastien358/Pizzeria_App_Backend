@@ -62,6 +62,7 @@ class ProductAdminController extends AbstractController
             $dataProducts = $this->productService->getProductData($request, $products, $serializer);
 
             return $this->json([
+                'total' => (int) $total,
                 'products' => $dataProducts,
                 'pages' => ceil($total / $limit)
             ], Response::HTTP_OK);

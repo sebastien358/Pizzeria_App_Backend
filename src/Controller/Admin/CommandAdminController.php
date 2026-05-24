@@ -53,7 +53,7 @@ class CommandAdminController extends AbstractController
 
             $total = $this->entityManager->getRepository(Command::class)->findAllCountByStatus(Command::STATUS_PAID);
             return $this->json([
-                'total' => $total,
+                'total' => (int) $total,
                 'commands' => $dataCommands,
                 'pages' => ceil($total / $limit),
             ], Response::HTTP_OK);

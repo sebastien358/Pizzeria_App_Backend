@@ -111,18 +111,17 @@ final class CommandController extends AbstractController
             $cartItems = $data['cartItems'] ?? [];
 
             $user = $this->getUser();
-
             if (!$user) {
-                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
+                return $this->json(['message' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
             }
 
             $command = new Command();
-            $command->setUser($user);
+            $command->setUser($this->getUser());
 
             $form = $this->createForm(CommandType::class, $command);
             $form->submit($dataClient, false);
 
-            if (!$form->isSubmitted() || !$form->isValid()) {
+            if (!$form->isValid()) {
                 $errors = $this->getErrorMessages($form);
                 return $this->json(['error' => $errors], Response::HTTP_BAD_REQUEST);
             }
@@ -132,22 +131,22 @@ final class CommandController extends AbstractController
             foreach ($cartItems as $cartItem) {
                 $product = $this->entityManager->getRepository(Product::class)->find($cartItem['id']);
                 if (!$product) {
-                    return $this->json(['error' => 'product not found'], Response::HTTP_NOT_FOUND);
+                    return $this->json(['error' => 'Produit introuvable'], Response::HTTP_NOT_FOUND);
                 }
 
-                $commandItem = new CommandItems();
-                $commandItem->setProduct($product);
-                $commandItem->setTitle($cartItem['title']);
-                $commandItem->setPrice($cartItem['price']);
-                $commandItem->setQuantity($cartItem['quantity']);
-                $command->addCommandItem($commandItem);
-                $total += $cartItem['price'] * $cartItem['quantity'];
-                $this->entityManager->persist($commandItem);
+                $commandItems = new CommandItems();
+                $commandItems->setProduct($product);
+                $commandItems->setTitle($cartItem['title']);
+                $commandItems->setPrice($cartItem['price']);
+                $commandItems->setQuantity($cartItem['quantity']);
+                $command->addCommandItem($commandItems);
+                $total += $commandItems->getPrice() * $commandItems->getQuantity();
+                $this->entityManager->persist($commandItems);
             }
 
             $command->setTotal($total);
-            $this->entityManager->persist($command);
 
+            $this->entityManager->persist($command);
             $this->entityManager->flush();
 
             return $this->json([
@@ -160,7 +159,7 @@ final class CommandController extends AbstractController
                 }
             ]);
         } catch(\Throwable $e) {
-            $this->logger->error('Error commande : ', ['error' => $e->getMessage()]);
+            $this->logger->error('error add commands', ['error' => $e->getMessage()]);
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
