@@ -64,10 +64,11 @@ class ProductAdminController extends AbstractController
             return $this->json([
                 'total' => (int) $total,
                 'products' => $dataProducts,
-                'pages' => ceil($total / $limit)
+                'pages' => ceil($total / $limit),
+                'total' => (int) $total,
             ], Response::HTTP_OK);
         } catch(\Throwable $e) {
-            $this->logger->error('Error récupération des produits', ['error' => $e->getMessage()]);
+            $this->logger->error('Error récupération des produits', [$e->getMessage()]);
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -117,7 +118,7 @@ class ProductAdminController extends AbstractController
 
             return $this->json($dataProduct, Response::HTTP_OK);
         } catch (\Throwable $e) {
-            $this->logger->error('Erreur récupération d\'un produit', ['error' => $e->getMessage()]);
+            $this->logger->error('Erreur récupération d\'un produit', [$e->getMessage()]);
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -150,7 +151,7 @@ class ProductAdminController extends AbstractController
 
             return $this->json(['message' => 'Produit ajouté avec succès'], Response::HTTP_CREATED);
         } catch (\Throwable $e) {
-            $this->logger->error('Erreur lors de l\'ajout d\'un produit : ', ['error' => $e->getMessage()]);
+            $this->logger->error('Erreur lors de l\'ajout d\'un produit : ', [$e->getMessage()]);
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -182,12 +183,11 @@ class ProductAdminController extends AbstractController
             }
 
             $this->productService->handleProductImages($request, $product);
-
             $this->entityManager->flush();
 
             return $this->json(['message' => 'Le produit a été modifié'], Response::HTTP_OK);
         } catch (\Throwable $e) {
-            $this->logger->error('Erreur modification d\'un produit', ['error' => $e->getMessage()]);
+            $this->logger->error('Erreur modification d\'un produit', [$e->getMessage()]);
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -215,9 +215,9 @@ class ProductAdminController extends AbstractController
             $this->entityManager->remove($product);
             $this->entityManager->flush();
 
-            return $this->json(['success delete product' => Response::HTTP_OK]);
+            return $this->json(['message' => 'success delete product'], Response::HTTP_OK);
         } catch (\Throwable $e) {
-            $this->logger->error('error recovery products', ['error' => $e->getMessage()]);
+            $this->logger->error('error recovery products', [$e->getMessage()]);
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -251,9 +251,9 @@ class ProductAdminController extends AbstractController
             $this->fileUploader->removeProductAdminImage($imageCurrent);
             $this->entityManager->flush();
 
-            return $this->json(['success delete product' => Response::HTTP_OK]);
+            return $this->json(['message' => 'success delete product'], Response::HTTP_OK);
         } catch (\Throwable $e) {
-            $this->logger->error('error recovery products', ['error' => $e->getMessage()]);
+            $this->logger->error('error recovery products', [$e->getMessage()]);
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

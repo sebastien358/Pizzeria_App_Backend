@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Product;
 use App\Services\ProductService;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,10 +19,13 @@ final class HomeController extends AbstractController
     private EntityManagerInterface $entityManager;
     private ProductService $productService;
 
-    public function __construct(EntityManagerInterface $entityManager, ProductService $productService)
+    private LoggerInterface $logger;
+
+    public function __construct(LoggerInterface $logger, EntityManagerInterface $entityManager, ProductService $productService)
     {
         $this->entityManager = $entityManager;
         $this->productService = $productService;
+        $this->logger = $logger;
     }
 
     #[Route('/list', methods: ['GET'])]
@@ -31,12 +35,17 @@ final class HomeController extends AbstractController
             $offset = (int) $request->query->get('offset');
             $limit = (int) $request->query->get('limit');
 
+            if ($offset < 0 || $limit < 0) {
+                return $this->json(['message' => 'Paramètres de pagination manquants'], Response::HTTP_BAD_REQUEST);
+            }
+
             $products = $this->entityManager->getRepository(Product::class)->findAllLoadProducts($offset, $limit);
 
             $dataProducts = $this->productService->getProductData($request, $products, $serializer);
 
             return $this->json($dataProducts, Response::HTTP_OK);
         } catch (\Throwable $e) {
+            $this->logger->error('Erreur de la récupération de la liste des produits', [$e->getMessage()]);
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -48,7 +57,7 @@ final class HomeController extends AbstractController
             $search = $request->query->get('search');
 
             if (!$search || !is_string($search)) {
-                return $this->json(['error' => 'Paramètre search obligatoire'], Response::HTTP_INTERNAL_SERVER_ERROR);
+                return $this->json(['error' => 'Paramètre search obligatoire'], Response::HTTP_BAD_REQUEST);
             }
 
             $search = trim((string) $search);
@@ -59,6 +68,7 @@ final class HomeController extends AbstractController
 
             return $this->json($dataProducts, Response::HTTP_OK);
         } catch (\Throwable $e) {
+            $this->logger->error('Erreur de la récupération de la liste des produits filtré : (search)', [$e->getMessage()]);
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
