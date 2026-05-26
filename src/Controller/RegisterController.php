@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Cart;
 use App\Entity\User;
 use App\Form\UserType;
+use App\Services\MailerProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,16 +18,18 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class RegisterController extends AbstractController
 {
-    private $entityManager;
-    private $passwordHasher;
-    private $logger;
+    private EntityManagerInterface $entityManager;
+    private UserPasswordHasherInterface $passwordHasher;
+    private LoggerInterface $logger;
+    private MailerProvider $mailerProvider;
 
     public function __construct(
-        EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher, LoggerInterface $logger)
+        EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher, LoggerInterface $logger, MailerProvider $mailerProvider)
     {
         $this->entityManager = $entityManager;
         $this->passwordHasher = $passwordHasher;
         $this->logger = $logger;
+        $this->mailerProvider = $mailerProvider;
     }
 
     #[Route('/api/register', methods: ['POST'])]
@@ -54,12 +57,15 @@ final class RegisterController extends AbstractController
             $user->setRoles(['ROLE_USER']);
 
             $this->entityManager->persist($user);
-
             $this->entityManager->flush();
+
+            $body = $this->render('emails/register.html.twig', [])->getContent();
+
+            $this->mailerProvider->sendEmail($user->getEmail(), 'Vous avez fait une demande d\'isncription', $body);
 
             return $this->json(['message' => 'Un compte a été créé'], Response::HTTP_CREATED);
         } catch (\Throwable $e) {
-            $this->logger->error('Erreur création d\'un compte', ['error' => $e->getMessage()]);
+            $this->logger->error('Erreur création d\'un compte', [$e->getMessage()]);
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
