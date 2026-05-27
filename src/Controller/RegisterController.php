@@ -24,7 +24,9 @@ final class RegisterController extends AbstractController
     private MailerProvider $mailerProvider;
 
     public function __construct(
-        EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher, LoggerInterface $logger, MailerProvider $mailerProvider)
+        EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher,
+        LoggerInterface $logger, MailerProvider $mailerProvider
+    )
     {
         $this->entityManager = $entityManager;
         $this->passwordHasher = $passwordHasher;
@@ -59,15 +61,21 @@ final class RegisterController extends AbstractController
             $this->entityManager->persist($user);
             $this->entityManager->flush();
 
-            $body = $this->render('emails/register.html.twig', [])->getContent();
-
-            $this->mailerProvider->sendEmail($user->getEmail(), 'Vous avez fait une demande d\'isncription', $body);
+            $this->sendConfirmationEmail($user);
 
             return $this->json(['message' => 'Un compte a été créé'], Response::HTTP_CREATED);
         } catch (\Throwable $e) {
             $this->logger->error('Erreur création d\'un compte', [$e->getMessage()]);
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+    public function sendConfirmationEmail(User $user): void
+    {
+        $body = $this->render('emails/register.html.twig', [
+            'email' => $user->getEmail(),
+        ])->getContent();
+
+        $this->mailerProvider->sendEmail($user->getEmail(), 'Confirmation de votre inscription', $body);
     }
 
     private function getErrorMessages(FormInterface $form): array

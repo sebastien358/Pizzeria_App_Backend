@@ -128,6 +128,10 @@ final class CommandController extends AbstractController
 
             $total = 0;
 
+            if ($dataClient['deliveryType'] === Command::DELIVERY_TYPE_SHIPPING) {
+                $total += 5;
+            }
+
             foreach ($cartItems as $cartItem) {
                 $product = $this->entityManager->getRepository(Product::class)->find($cartItem['id']);
                 if (!$product) {
@@ -144,7 +148,7 @@ final class CommandController extends AbstractController
                 $this->entityManager->persist($commandItems);
             }
 
-            $command->setTotal($total);
+            $command->setTotal(round($total, 2));
 
             $this->entityManager->persist($command);
             $this->entityManager->flush();

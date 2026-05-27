@@ -33,7 +33,7 @@ final class PaymentController extends AbstractController
         $this->mailerProvider = $mailerProvider;
     }
 
-    #[Route('/api/paymen', methods: ['POST'])]
+    #[Route('/api/payment', methods: ['POST'])]
     public function payment(Request $request, LoggerInterface $logger): JsonResponse
     {
         try {
@@ -67,19 +67,9 @@ final class PaymentController extends AbstractController
 
             $totalAmount = $command->getTotal();
 
-            // Montant avec la livraison
-
-            $deliveryPrice = 5;
-
-            if ($command->getDeliveryType() === 'Livraison') {
-                $totalAmount += $deliveryPrice;
-            }
-
             // Montant en centimes pour Stripe
 
             $totalAmountCents = (int) ($totalAmount * 100);
-
-            //$total = 100;
 
             $stripe = new \Stripe\StripeClient($this->keyPrivate);
             $paymentIntent = $stripe->paymentIntents->create([
@@ -137,10 +127,10 @@ final class PaymentController extends AbstractController
             }
 
         } catch (\Stripe\Exception\ApiErrorException $e) {
-            $logger->error('Erreur Stripe : ' . $e->getMessage());
+            $this->logger->error('Erreur Stripe : ' . $e->getMessage());
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         } catch (\Throwable $e) {
-            $logger->error('Erreur serveur : ' . $e->getMessage());
+            $this->logger->error('Erreur serveur : ' . $e->getMessage());
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
