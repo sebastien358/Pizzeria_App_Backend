@@ -49,11 +49,10 @@ final class PaymentController extends AbstractController
             }
 
             $user = $this->getUser();
+
             if (!$user) {
                 return $this->json(['error' => 'Utilisateur non connecté'], Response::HTTP_UNAUTHORIZED);
             }
-
-            $totalAmount = 0;
 
             $commandId = $profileId ?? $pendingId;
             if (!$commandId) {
@@ -64,6 +63,8 @@ final class PaymentController extends AbstractController
             if (!$command) {
                 return $this->json(['error' => 'Command introuvable'], Response::HTTP_NOT_FOUND);
             }
+
+            $totalAmount = 0;
 
             $totalAmount = $command->getTotal();
 
