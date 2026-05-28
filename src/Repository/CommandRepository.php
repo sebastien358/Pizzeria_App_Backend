@@ -75,12 +75,14 @@ class CommandRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
-    public function countCommandsUnread()
+    public function countCommandsAdminUnread()
     {
         return $this->createQueryBuilder('command')
             ->select('count(command.id)')
             ->where('command.isRead = :isRead')
+            ->andWhere('command.status = :status')
             ->setParameter('isRead', false)
+            ->setParameter('status', Command::STATUS_PAID)
             ->getQuery()
             ->getSingleScalarResult();
     }
