@@ -80,6 +80,10 @@ class Command
     #[Groups(['commands'])]
     private ?string $deliveryType = null;
 
+    #[ORM\Column(type: 'boolean')]
+    #[Groups(['commands'])]
+    private ?bool $isRead = false;
+
     #[ORM\Column(type: 'datetime_immutable')]
     #[Groups(['commands'])]
     private \DateTimeImmutable $createdAt;
@@ -249,6 +253,18 @@ class Command
     public function setDeliveryType(string $deliveryType): static
     {
         $this->deliveryType = $deliveryType;
+
+        return $this;
+    }
+
+    public function getIsRead(): bool
+    {
+        return $this->isRead;
+    }
+
+    public function setIsRead(bool $isRead): static
+    {
+        $this->isRead = $isRead;
 
         return $this;
     }
