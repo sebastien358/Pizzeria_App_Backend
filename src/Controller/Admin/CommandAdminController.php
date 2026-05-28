@@ -52,8 +52,11 @@ class CommandAdminController extends AbstractController
             $dataCommands = $this->commandService->getCommandData($request, $commands, $serializer);
 
             $total = $this->entityManager->getRepository(Command::class)->findAllCountByStatus(Command::STATUS_PAID);
+
+            $countCommandsUnread = $this->entityManager->getRepository(Command::class)->countCommandsUnread();
             return $this->json([
                 'total' => (int) $total,
+                'countCommandsUnread' => (int) $countCommandsUnread,
                 'commands' => $dataCommands,
                 'pages' => ceil($total / $limit),
             ], Response::HTTP_OK);
@@ -82,6 +85,32 @@ class CommandAdminController extends AbstractController
             $dataCommands = $this->commandService->getCommandData($request, $commands, $serializer);
 
             return $this->json($dataCommands, Response::HTTP_OK);
+        } catch (\Throwable $e) {
+            $this->logger->error('Erreur de la récupération des commandes : ', ['error' => $e->getMessage()]);
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    #[Route('/is-read/{id}', methods: ['PATCH'])]
+    public function isRead(int $id): JsonResponse
+    {
+        try {
+            $user = $this->getUser();
+            if (!$user) {
+                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
+            }
+
+            $command = $this->entityManager->getRepository(Command::class)->find($id);
+            if (!$command) {
+                return $this->json(['error' => 'Command introuvable'], Response::HTTP_BAD_REQUEST);
+            }
+
+            $command->setIsRead(true);
+            $this->entityManager->persist($command);
+
+            $this->entityManager->flush();
+
+            return $this->json(['success' => true], Response::HTTP_OK);
         } catch (\Throwable $e) {
             $this->logger->error('Erreur de la récupération des commandes : ', ['error' => $e->getMessage()]);
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
