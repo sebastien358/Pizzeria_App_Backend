@@ -85,6 +85,18 @@ class CommandRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    public function countCommandUserPending(User $user)
+    {
+        return $this->createQueryBuilder('command')
+            ->select('count(command.id)')
+            ->andWhere('command.user = :user')
+            ->andWhere('command.status = :status')
+            ->setParameter('user', $user)
+            ->setParameter('status', Command::STATUS_PENDING)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     //    /**
     //     * @return Command[] Returns an array of Command objects
     //     */

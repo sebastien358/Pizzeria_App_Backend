@@ -57,9 +57,11 @@ final class CommandController extends AbstractController
             $dataCommands = $this->commandService->getCommandData($request, $commands, $serializer);
 
             $total = $this->entityManager->getRepository(Command::class)->findAllCountCommand($user);
+            $countCommandUserPending = $this->entityManager->getRepository(Command::class)->countCommandUserPending($user);
 
             return $this->json([
                 'commands' => $dataCommands,
+                'countCommandPending' => (int) $countCommandUserPending,
                 'total' => $total ?? 0,
                 'pages' => $limit > 0 ? ceil(($total ?? 0) / $limit) : 1
             ], Response::HTTP_OK);
