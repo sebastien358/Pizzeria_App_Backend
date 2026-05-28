@@ -31,6 +31,10 @@ class Contact
     #[Groups('contacts')]
     private ?string $message = null;
 
+    #[ORM\Column(type: 'boolean')]
+    #[Groups('contacts')]
+    private ?bool $isRead = false;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -80,6 +84,18 @@ class Contact
     public function setMessage(string $message): static
     {
         $this->message = $message;
+
+        return $this;
+    }
+
+    public function getIsRead(): ?bool
+    {
+        return $this->isRead;
+    }
+
+    public function setIsRead(bool $isRead): static
+    {
+        $this->isRead = $isRead;
 
         return $this;
     }
