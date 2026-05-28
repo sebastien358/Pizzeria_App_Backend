@@ -53,7 +53,7 @@ class CommandAdminController extends AbstractController
 
             $total = $this->entityManager->getRepository(Command::class)->findAllCountByStatus(Command::STATUS_PAID);
 
-            $countCommandsUnread = $this->entityManager->getRepository(Command::class)->countCommandsUnread();
+            $countCommandsUnread = $this->entityManager->getRepository(Command::class)->countCommandsAdminUnread();
             return $this->json([
                 'total' => (int) $total,
                 'countCommandsUnread' => (int) $countCommandsUnread,
