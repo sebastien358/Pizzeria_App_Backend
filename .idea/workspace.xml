@@ -7,7 +7,9 @@
     <list default="true" id="ddaf4521-9ec5-4a69-80e9-26fd216d435a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/User/PaymentController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/User/PaymentController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/Admin/ContactAdminController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/Admin/ContactAdminController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Entity/Contact.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Entity/Contact.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Repository/ContactRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/ContactRepository.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -185,7 +187,7 @@
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
     &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
     &quot;git-widget-placeholder&quot;: &quot;new-version&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/petitsebastien/Desktop/Pizzeria_App_Backend&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/petitsebastien/PhpstormProjects/Pizzeria_App_Backend&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -273,6 +275,9 @@
       <workItem from="1779386337497" duration="891000" />
       <workItem from="1779650906137" duration="2055000" />
       <workItem from="1779871939877" duration="2788000" />
+      <workItem from="1779891790750" duration="1216000" />
+      <workItem from="1779906728847" duration="1169000" />
+      <workItem from="1779947899830" duration="8205000" />
     </task>
     <servers />
   </component>
