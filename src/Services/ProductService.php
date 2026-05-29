@@ -63,9 +63,7 @@ class ProductService
     {
         $images = $request->files->get('images');
 
-        if (!$images) {
-            return; // rien à faire
-        }
+        if (!$images) return;
 
         foreach ($images as $image) {
             if ($image->getSize() > 10 * 1024 * 1024) {

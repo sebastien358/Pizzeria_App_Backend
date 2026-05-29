@@ -26,19 +26,24 @@ class FileUploader
     public function removeProductAdminImage($imageCurrent)
     {
         $fileExist = $this->targetDirectory . '/' . $imageCurrent->getFileName();
+
         if (file_exists($fileExist)) {
             unlink($fileExist);
         }
+
         $this->entityManager->remove($imageCurrent);
     }
 
     public function removeProductImage($images)
     {
+        if (!$images) return;
+
         foreach ($images as $picture) {
             $fileName = $this->targetDirectory . '/' . $picture->getFileName();
             if (file_exists($fileName)) {
                 unlink($fileName);
             }
+
             $this->entityManager->remove($picture);
         }
     }
