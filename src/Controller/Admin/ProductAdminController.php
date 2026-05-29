@@ -208,9 +208,7 @@ class ProductAdminController extends AbstractController
             }
 
             $images = $product->getPictures();
-            if ($images && !$images->isEmpty()) {
-                $this->fileUploader->removeProductImage($images);
-            }
+            $this->fileUploader->removeProductImage($images);
 
             $this->entityManager->remove($product);
             $this->entityManager->flush();
@@ -227,11 +225,13 @@ class ProductAdminController extends AbstractController
     {
         try {
             $user = $this->getUser();
+
             if (!$user) {
                 return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
             }
 
             $product = $this->entityManager->getRepository(Product::class)->find($productId);
+
             if (empty($product)) {
                 return $this->json(['error' => 'Product not found'], Response::HTTP_BAD_REQUEST);
             }
