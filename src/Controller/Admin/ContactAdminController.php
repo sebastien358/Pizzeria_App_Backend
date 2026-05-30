@@ -66,6 +66,33 @@ class ContactAdminController extends AbstractController
         }
     }
 
+    #[Route('/contact/current/{id}', methods: ['GET'])]
+    public function current(int $id, SerializerInterface $serializer): JsonResponse
+    {
+        try {
+            $user = $this->getUser();
+            if (!$user) {
+                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
+            }
+
+            $contact = $this->entityManager->getRepository(Contact::class)->find($id);
+            if (!$contact) {
+                return $this->json(['error' => 'Contact introuvable'], Response::HTTP_NOT_FOUND);
+            }
+
+            $dataContact = $serializer->normalize($contact, 'json', ['groups' => ['contacts'],
+                'circular_reference_handler' => function ($object) {
+                    return $object->getId();
+                }
+            ]);
+
+            return $this->json($dataContact, Response::HTTP_OK);
+        } catch(\Throwable $e) {
+            $this->logger->error('Erreur de la récupération du détails d\'un contact : ', [$e->getMessage()]);
+            return $this->json(['error' => 'Erreur de la récupération du détails d\'un contact '], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     #[Route('/contact/is-read/{id}', methods: ['PATCH'])]
     public function isRead(int $id): JsonResponse
     {
