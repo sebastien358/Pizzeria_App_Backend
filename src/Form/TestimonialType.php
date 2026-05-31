@@ -2,8 +2,11 @@
 
 namespace App\Form;
 
-use App\Entity\Tesmimonial;
+use App\Entity\Testimonial;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -12,16 +15,16 @@ class TestimonialType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('createdAt', null, [
-                'widget' => 'single_text',
-            ])
-        ;
+            ->add('firstname', TextType::class)
+            ->add('lastname', TextType::class)
+            ->add('rating', NumberType::class               )
+            ->add('message', TextareaType::class);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Tesmimonial::class,
+            'data_class' => Testimonial::class,
             'csrf_protection' => false,
         ]);
     }

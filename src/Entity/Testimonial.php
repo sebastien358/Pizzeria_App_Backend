@@ -3,7 +3,10 @@
 namespace App\Entity;
 
 use App\Repository\TestimonialRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: TestimonialRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -12,22 +15,41 @@ class Testimonial
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['testimonials', 'testimonial'])]
     private ?int $id = null;
 
-    #[ORM\Column(length: 200)]
-    private ?string $author = null;
+    #[ORM\Column(length: 125)]
+    #[Groups(['testimonials', 'testimonial'])]
+    private ?string $firstname = null;
+
+    #[ORM\Column(length: 125)]
+    #[Groups(['testimonials', 'testimonial'])]
+    private ?string $lastname = null;
 
     #[ORM\Column]
+    #[Groups(['testimonials', 'testimonial'])]
     private ?float $rating = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['testimonials', 'testimonial'])]
     private ?string $message = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['testimonials', 'testimonial'])]
     private ?bool $isPublished = null;
 
     #[ORM\Column(type: 'datetime_immutable')]
+    #[Groups(['testimonials', 'testimonial'])]
     private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\OneToMany(targetEntity: Picture::class, mappedBy: 'testimonial', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[Groups(['testimonials', 'testimonial'])]
+    private Collection $pictures;
+
+    public function __construct()
+    {
+        $this->pictures = new ArrayCollection();
+    }
 
     #[ORM\PrePersist]
     public function setCreatedAt(): void
@@ -40,14 +62,26 @@ class Testimonial
         return $this->id;
     }
 
-    public function getAuthor(): ?string
+    public function getFirstname(): ?string
     {
-        return $this->author;
+        return $this->firstname;
     }
 
-    public function setAuthor(string $author): static
+    public function setFirstname(string $firstname): self
     {
-        $this->author = $author;
+        $this->firstname = $firstname;
+
+        return $this;
+    }
+
+    public function getLastname(): ?string
+    {
+        return $this->lastname;
+    }
+
+    public function setLastname(string $lastname): self
+    {
+        $this->lastname = $lastname;
 
         return $this;
     }
@@ -91,5 +125,28 @@ class Testimonial
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
+    }
+
+    public function getPictures(): Collection
+    {
+        return $this->pictures;
+    }
+
+    public function addPicture(Picture $picture): self
+    {
+        if (!$this->pictures->contains($picture)) {
+            $this->pictures[] = $picture;
+            $picture->setTestimonial($this);
+        }
+        return $this;
+    }
+
+    public function removePicture(Picture $picture): self
+    {
+        if ($this->pictures->contains($picture)) {
+            $this->pictures->removeElement($picture);
+            $picture->setTestimonial(null);
+        }
+        return $this;
     }
 }
