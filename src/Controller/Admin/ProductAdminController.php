@@ -128,8 +128,9 @@ class ProductAdminController extends AbstractController
     {
         try {
             $user = $this->getUser();
+
             if (!$user) {
-                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_FORBIDDEN);
+                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
             }
 
             $product = new Product();
@@ -139,9 +140,9 @@ class ProductAdminController extends AbstractController
             $data = $request->request->all();
             $form->submit($data, false);
 
-            if (!$form->isValid()) {
+            if (!$form->isSubmitted() && !$form->isValid()) {
                 $errors = $this->getErrorMessages($form);
-                return $this->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+                return $this->json(['error' => $errors], Response::HTTP_BAD_REQUEST);
             }
 
             $this->productService->handleProductImages($request, $product);
@@ -149,7 +150,7 @@ class ProductAdminController extends AbstractController
             $this->entityManager->persist($product);
             $this->entityManager->flush();
 
-            return $this->json(['message' => 'Produit ajouté avec succès'], Response::HTTP_CREATED);
+            return $this->json(['message' => 'Le produit a bien été ajouté'], Response::HTTP_CREATED);
         } catch (\Throwable $e) {
             $this->logger->error('Erreur lors de l\'ajout d\'un produit : ', [$e->getMessage()]);
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);

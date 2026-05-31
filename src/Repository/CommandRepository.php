@@ -48,9 +48,9 @@ class CommandRepository extends ServiceEntityRepository
             ->addSelect('ci')
             ->andWhere('command.status = :paid')
             ->setParameter('paid', Command::STATUS_PAID)
+            ->orderBy('command.createdAt', 'DESC')
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit)
-            ->orderBy('command.createdAt', 'DESC')
             ->getQuery()
             ->getResult();
     }
@@ -91,7 +91,7 @@ class CommandRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('command')
             ->select('count(command.id)')
-            ->andWhere('command.user = :user')
+            ->where('command.user = :user')
             ->andWhere('command.status = :status')
             ->setParameter('user', $user)
             ->setParameter('status', Command::STATUS_PENDING)

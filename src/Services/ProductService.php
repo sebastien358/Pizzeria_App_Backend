@@ -66,17 +66,19 @@ class ProductService
         if (!$images) return;
 
         foreach ($images as $image) {
-            if ($image->getSize() > 10 * 1024 * 1024) {
-                throw new \Exception('Image trop volumineuse : ' . $image->getClientOriginalName());
+            if ($image->getSize() > 5 * 1024 * 1024) {
+                throw new \Exception('La taille de l\'image est trop grande'. $image->getClientOriginalName());
             }
 
             $filename = $this->fileUploader->upload($image);
 
             $picture = new Picture();
+
             $picture->setFilename($filename);
             $picture->setProduct($product);
 
             $this->entityManager->persist($picture);
+
         }
     }
 }
