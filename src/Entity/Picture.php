@@ -24,6 +24,10 @@ class Picture
     #[Groups(['pictures'])]
     private ?Product $product = null;
 
+    #[ORM\ManyToOne(targetEntity: Testimonial::class, inversedBy: 'pictures')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
+    private ?Testimonial $testimonial = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -49,6 +53,18 @@ class Picture
     public function setProduct(?Product $product): static
     {
         $this->product = $product;
+
+        return $this;
+    }
+
+    public function getTestimonial(): ?Testimonial
+    {
+        return $this->testimonial;
+    }
+
+    public function setTestimonial(?Testimonial $testimonial): static
+    {
+        $this->testimonial = $testimonial;
 
         return $this;
     }
