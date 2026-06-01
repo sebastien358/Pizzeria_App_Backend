@@ -37,14 +37,24 @@ final class TestimonialController extends AbstractController
     public function list(Request $request, SerializerInterface $serializer): JsonResponse
     {
         try {
-            $testimonials = $this->entityManager->getRepository(Testimonial::class)->findAllPaginated();
+            $currentPage = $request->query->get('currentPage');
+            $limit = $request->query->get('limit');
+
+            if ($currentPage < 1 && $limit < 1) {
+                return $this->json(['message' => "Les données ne sont pas correctes"], Response::HTTP_BAD_REQUEST);
+            }
+
+            $testimonials = $this->entityManager->getRepository(Testimonial::class)->findAllPaginated($currentPage, $limit);
             $dataTestimonials = $this->testimonialService->getTestimonialData($request, $testimonials, $serializer);
 
             $countTestimonials = $this->entityManager->getRepository(Testimonial::class)->findAllCount();
+            $average = $this->entityManager->getRepository(Testimonial::class)->getAverageRating();
 
             return $this->json([
                 'testimonials' => $dataTestimonials,
                 'countTestimonials' => (int) $countTestimonials,
+                'pages' => ceil($countTestimonials / $limit),
+                'averageRating' => round($average, 1), // <- ajoute ça
             ], Response::HTTP_OK);
         } catch(\Throwable $exception) {
             $this->logger->error('Erreur de la récupération des témoignages : ', [$exception->getMessage()]);
@@ -68,7 +78,7 @@ final class TestimonialController extends AbstractController
                 return $this->json(['error' => $errors], Response::HTTP_BAD_REQUEST);
             }
 
-            $images = $request->files->get('images');
+            $images = $request->files->get('images') ?? [];
 
             foreach ($images as $image) {
                 if ($image->getSize() > 5 * 1024 * 1024) {

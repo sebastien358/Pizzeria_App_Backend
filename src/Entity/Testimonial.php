@@ -36,7 +36,7 @@ class Testimonial
 
     #[ORM\Column(nullable: true)]
     #[Groups(['testimonials', 'testimonial'])]
-    private ?bool $isPublished = null;
+    private ?bool $isPublished = false;
 
     #[ORM\Column(type: 'datetime_immutable')]
     #[Groups(['testimonials', 'testimonial'])]
