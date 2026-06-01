@@ -16,6 +16,18 @@ class TestimonialRepository extends ServiceEntityRepository
         parent::__construct($registry, Testimonial::class);
     }
 
+    public function findAllPaginated(int $currentPage, int $limit): array
+    {
+        return $this->createQueryBuilder('t')
+            ->orderBy('t.createdAt', 'DESC')
+            ->where('t.isPublished = :isPublished')
+            ->setParameter('isPublished', false)
+            ->setFirstResult(($currentPage - 1) * $limit)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findAllCount()
     {
         return $this->createQueryBuilder('t')
@@ -24,12 +36,14 @@ class TestimonialRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
-    public function findAllPaginated()
+    public function getAverageRating(): float
     {
         return $this->createQueryBuilder('t')
-            ->orderBy('t.createdAt', 'DESC')
+            ->select('AVG(t.rating)')
+            ->where('t.isPublished = :isPublished ')
+            ->setParameter('isPublished', false)
             ->getQuery()
-            ->getResult();
+            ->getSingleScalarResult() ?? 0;
     }
 
     //    /**

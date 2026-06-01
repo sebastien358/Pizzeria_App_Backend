@@ -65,7 +65,6 @@ class ProductAdminController extends AbstractController
                 'total' => (int) $total,
                 'products' => $dataProducts,
                 'pages' => ceil($total / $limit),
-                'total' => (int) $total,
             ], Response::HTTP_OK);
         } catch(\Throwable $e) {
             $this->logger->error('Error récupération des produits', [$e->getMessage()]);
