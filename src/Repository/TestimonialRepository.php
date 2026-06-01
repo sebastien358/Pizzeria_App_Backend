@@ -16,6 +16,14 @@ class TestimonialRepository extends ServiceEntityRepository
         parent::__construct($registry, Testimonial::class);
     }
 
+    public function findAllCount()
+    {
+        return $this->createQueryBuilder('t')
+            ->select('COUNT(t.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     public function findAllPaginated()
     {
         return $this->createQueryBuilder('t')
