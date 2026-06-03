@@ -25,7 +25,13 @@ class TestimonialService
 
             return $dataTestimonials;
         } else {
-            return null;
+            $dataTestimonial = $serializer->normalize($testimonials, 'json', ['groups' => ['testimonials', 'pictures'],
+                'circular_reference_handler' => function ($object) {
+                    return $object->getId();
+                }
+            ]);
+
+            return $dataTestimonial;
         }
     }
 }
