@@ -47,4 +47,18 @@ class FileUploader
             $this->entityManager->remove($picture);
         }
     }
+
+    public function removeTestimonialImage($images)
+    {
+        if (!$images) return;
+
+        foreach ($images as $picture) {
+            $fileName = $this->targetDirectory . '/' . $picture->getFileName();
+            if (file_exists($fileName)) {
+                unlink($fileName);
+            }
+
+            $this->entityManager->remove($picture);
+        }
+    }
 }

@@ -18,7 +18,6 @@ final class HomeController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
     private ProductService $productService;
-
     private LoggerInterface $logger;
 
     public function __construct(LoggerInterface $logger, EntityManagerInterface $entityManager, ProductService $productService)

@@ -34,7 +34,11 @@ class Testimonial
     #[Groups(['testimonials', 'testimonial'])]
     private ?string $message = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(type: 'boolean')]
+    #[Groups(['testimonials', 'testimonial'])]
+    private ?bool $isRead = false;
+
+    #[ORM\Column(type: 'boolean')]
     #[Groups(['testimonials', 'testimonial'])]
     private ?bool $isPublished = false;
 
@@ -106,6 +110,18 @@ class Testimonial
     public function setMessage(string $message): static
     {
         $this->message = $message;
+
+        return $this;
+    }
+
+    public function isRead(): ?bool
+    {
+        return $this->isRead;
+    }
+
+    public function setIsRead(?bool $isRead): self
+    {
+        $this->isRead = $isRead;
 
         return $this;
     }

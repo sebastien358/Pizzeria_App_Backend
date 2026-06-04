@@ -33,12 +33,30 @@ final class TestimonialController extends AbstractController
         $this->testimonialService = $testimonialService;
     }
 
+    #[Route('/home', methods: ['GET'])]
+    public function index(Request $request, SerializerInterface $serializer): JsonResponse
+    {
+        try {
+            $testimonials = $this->entityManager->getRepository(Testimonial::class)->findAllTestimonialsHomePage();
+            if(empty($testimonials)) {
+                return $this->json([], Response::HTTP_OK);
+            }
+
+            $dataTestimonials = $this->testimonialService->getTestimonialData($request, $testimonials , $serializer);
+
+            return $this->json($dataTestimonials, Response::HTTP_OK);
+        } catch (\Throwable $e) {
+            $this->logger->error('Erreur de la récupération de la liste des témoignage de la page home', [$e->getMessage()]);
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     #[Route('/list', methods: ['GET'])]
     public function list(Request $request, SerializerInterface $serializer): JsonResponse
     {
         try {
-            $currentPage = $request->query->get('currentPage');
-            $limit = $request->query->get('limit');
+            $currentPage = (int) $request->query->get('currentPage');
+            $limit = (int) $request->query->get('limit');
 
             if ($currentPage < 1 && $limit < 1) {
                 return $this->json(['message' => "Les données ne sont pas correctes"], Response::HTTP_BAD_REQUEST);
