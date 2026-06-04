@@ -28,6 +28,37 @@ class TestimonialRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function findAllPaginatedAdmin(int $currentPage, int $limit): array
+    {
+        return $this->createQueryBuilder('t')
+            ->orderBy('t.createdAt', 'DESC')
+            ->setFirstResult(($currentPage - 1) * $limit)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAllTestimonialsHomePage()
+    {
+        return $this->createQueryBuilder('t')
+            ->orderBy('t.createdAt', 'DESC')
+            ->where('t.isPublished = :isPublished')
+            ->setParameter('isPublished', true)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAllAdminLazyLoad(string $search)
+    {
+        return $this->createQueryBuilder('t')
+            ->where('t.firstname LIKE :firstname OR t.lastname LIKE :lastname')
+            ->setParameter('firstname', '%'. $search .'%')
+            ->setParameter('lastname', '%'. $search .'%')
+            ->orderBy('t.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findAllCount()
     {
         return $this->createQueryBuilder('t')

@@ -5,7 +5,30 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ddaf4521-9ec5-4a69-80e9-26fd216d435a" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/Version20260412114037.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/Version20260412120033.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/Version20260412121517.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/Version20260502125053.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/Version20260517135928.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/Version20260521163532.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/Version20260528100101.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/Version20260528100810.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/Version20260528130041.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/Version20260528185702.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/Version20260528185826.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/Version20260531092156.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/Version20260531092424.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/Version20260531152200.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/Version20260531174033.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/Version20260601071355.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/Admin/TestimonialAdminController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/Admin/TestimonialAdminController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/HomeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/HomeController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/TestimonialController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/TestimonialController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Entity/Testimonial.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Entity/Testimonial.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Repository/TestimonialRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/TestimonialRepository.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Services/FileUploader.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Services/FileUploader.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -278,6 +301,7 @@
       <workItem from="1780166689668" duration="3229000" />
       <workItem from="1780312944817" duration="8348000" />
       <workItem from="1780412339407" duration="1464000" />
+      <workItem from="1780568325717" duration="12370000" />
     </task>
     <servers />
   </component>

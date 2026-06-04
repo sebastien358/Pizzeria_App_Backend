@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Testimonial;
+use App\Services\FileUploader;
 use App\Services\TestimonialService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -21,12 +22,14 @@ class TestimonialAdminController extends AbstractController
     private LoggerInterface $logger;
     private EntityManagerInterface $entityManager;
     private TestimonialService $testimonialService;
+    private FileUploader $fileUploader;
 
-    public function __construct(LoggerInterface $logger, EntityManagerInterface $entityManager, TestimonialService $testimonialService)
+    public function __construct(LoggerInterface $logger, EntityManagerInterface $entityManager, TestimonialService $testimonialService, FileUploader $fileUploader)
     {
         $this->logger = $logger;
         $this->entityManager = $entityManager;
         $this->testimonialService = $testimonialService;
+        $this->fileUploader = $fileUploader;
     }
 
     #[Route('/list', methods: ['GET'])]
@@ -35,11 +38,50 @@ class TestimonialAdminController extends AbstractController
         try {
             $user = $this->getUser();
 
-            if(!$user){
+            if (!$user) {
                 return $this->json(['message' => 'Utlisateur introuvable'], Response::HTTP_UNAUTHORIZED);
             }
 
-            $testimonials = $this->entityManager->getRepository(Testimonial::class)->findAll();
+            $currentPage = (int) $request->query->get('currentPage');
+            $limit = (int) $request->query->get('limit');
+
+            if (!number_format($currentPage) || !number_format($limit)) {
+                return $this->json(['error' => 'Donneés manquantes'], Response::HTTP_BAD_REQUEST);
+            }
+
+            $testimonials = $this->entityManager->getRepository(Testimonial::class)->findAllPaginatedAdmin($currentPage, $limit);
+            $totalTestimonials = $this->entityManager->getRepository(Testimonial::class)->findAllCount();
+
+            $dataTestimonials = $this->testimonialService->getTestimonialData($request, $testimonials, $serializer);
+
+            return $this->json([
+                'testimonials' => $dataTestimonials,
+                'totalTestimonials' => (int) $totalTestimonials,
+                'pages' => ceil($totalTestimonials / $limit)
+            ], Response::HTTP_OK);
+        } catch(\Throwable $e) {
+            $this->logger->error('Erreur de la récupération des témoignages', [$e->getMessage()]);
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    #[Route('/lazy-load', methods: ['GET'])]
+    public function load(Request $request, SerializerInterface $serializer): JsonResponse
+    {
+        try {
+            $user = $this->getUser();
+
+            if (!$user) {
+                return $this->json(['message' => 'Utlisateur introuvable'], Response::HTTP_UNAUTHORIZED);
+            }
+
+            $search = (string) $request->query->get('search');
+
+            if (!is_string($search)) {
+                return $this->json(['error' => 'Donneé attendu manquante'], Response::HTTP_BAD_REQUEST);
+            }
+
+            $testimonials = $this->entityManager->getRepository(Testimonial::class)->findAllAdminLazyLoad($search);
             $dataTestimonials = $this->testimonialService->getTestimonialData($request, $testimonials, $serializer);
 
             return $this->json($dataTestimonials, Response::HTTP_OK);
@@ -66,9 +108,44 @@ class TestimonialAdminController extends AbstractController
             }
 
             $dataTestimonial = $this->testimonialService->getTestimonialData($request, $testimonial, $serializer);
+
+            $testimonial->setIsRead(true);
+
+            $this->entityManager->persist($testimonial);
+            $this->entityManager->flush();
+
             return $this->json($dataTestimonial, Response::HTTP_OK);
         } catch(\Throwable $e) {
             $this->logger->error('Erreur de la récupération des témoignages', [$e->getMessage()]);
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    #[Route('/current/{id}/delete', methods: ['DELETE'])]
+    public function delete(int $id): JsonResponse
+    {
+        try {
+            $user = $this->getUser();
+
+            if(!$user){
+                return $this->json(['message' => 'Utlisateur introuvable'], Response::HTTP_UNAUTHORIZED);
+            }
+
+            $testimonial = $this->entityManager->getRepository(Testimonial::class)->find($id);
+
+            if (!$testimonial) {
+                return $this->json(['message' => 'Témoignage introuvable'], Response::HTTP_BAD_REQUEST);
+            }
+
+            $images = $testimonial->getPictures();
+            $this->fileUploader->removeTestimonialImage($images);
+
+            $this->entityManager->remove($testimonial);
+            $this->entityManager->flush();
+
+            return $this->json(['message' => 'Le témoignage a été supprimé'], Response::HTTP_OK);
+        } catch(\Throwable $e) {
+            $this->logger->error('Le témoignage a été supprimé', [$e->getMessage()]);
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
