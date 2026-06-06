@@ -14,6 +14,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[ORM\HasLifecycleCallbacks]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -39,6 +40,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['users', 'user'])]
     private array $roles = [];
 
+    #[ORM\Column(type: 'datetime_immutable')]
+    #[Groups(['users', 'user'])]
+    private ?\DateTimeImmutable $createdAt;
+
+    #[ORM\Column(type: 'boolean')]
+    #[Groups(['users', 'user'])]
+    private ?bool $isVisible = true;
+
     #[ORM\OneToMany(targetEntity: Command::class, mappedBy: "user", cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[Groups(['users', 'user'])]
     private Collection $command;
@@ -53,6 +62,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    #[ORM\PrePersist]
+    public function prePersist(): void
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
+
 
     public function getId(): ?int
     {
@@ -158,6 +174,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // @deprecated, to be removed when upgrading to Symfony 8
     }
+
+   public function getCreatedAt(): ?\DateTimeImmutable
+   {
+       return $this->createdAt;
+   }
+
+   public function setCreatedAt(\DateTimeImmutable $createdAt): self
+   {
+       $this->createdAt = $createdAt;
+
+       return $this;
+   }
+
+   public function getIsVisible(): ?bool
+   {
+       return $this->isVisible;
+   }
+
+   public function setIsVisible(bool $isVisible): self
+   {
+       $this->isVisible = $isVisible;
+
+       return $this;
+   }
 
    public function getCommand(): Collection
    {
