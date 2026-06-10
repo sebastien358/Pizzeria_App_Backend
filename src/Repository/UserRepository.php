@@ -33,11 +33,30 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
+    public function findAllUsers()
+    {
+        return $this->createQueryBuilder('u')
+            ->orderBy('u.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function unreadClientsCount()
+    {
+        return $this->createQueryBuilder('u')
+            ->select('count(u.id)')
+            ->where('u.isRead = :isRead')
+            ->setParameter('isRead', false)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     public function findAllSearchClients(string $search)
     {
         return $this->createQueryBuilder('u')
             ->where('u.email LIKE :search')
             ->setParameter('search', '%' . $search . '%')
+            ->orderBy('u.createdAt', 'DESC')
             ->getQuery()
             ->getResult();
     }
