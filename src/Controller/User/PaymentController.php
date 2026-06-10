@@ -34,7 +34,7 @@ final class PaymentController extends AbstractController
     }
 
     #[Route('/api/payment', methods: ['POST'])]
-    public function payment(Request $request, LoggerInterface $logger): JsonResponse
+    public function payment(Request $request): JsonResponse
     {
         try {
             $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
@@ -67,6 +67,8 @@ final class PaymentController extends AbstractController
             $totalAmount = 0;
 
             $totalAmount = $command->getTotal();
+
+            dd($totalAmount);
 
             // Montant en centimes pour Stripe
 

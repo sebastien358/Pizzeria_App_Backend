@@ -48,6 +48,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['users', 'user'])]
     private ?bool $isVisible = true;
 
+    #[ORM\Column(type: 'boolean')]
+    #[Groups(['users', 'user'])]
+    private ?bool $isRead = false;
+
     #[ORM\OneToMany(targetEntity: Command::class, mappedBy: "user", cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[Groups(['users', 'user'])]
     private Collection $command;
@@ -195,6 +199,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
    public function setIsVisible(bool $isVisible): self
    {
        $this->isVisible = $isVisible;
+
+       return $this;
+   }
+
+   public function getIsRead(): ?bool
+   {
+       return $this->isRead;
+   }
+
+   public function setIsRead(bool $isRead): self
+   {
+       $this->isRead = $isRead;
 
        return $this;
    }

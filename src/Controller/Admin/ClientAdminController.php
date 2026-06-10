@@ -38,11 +38,15 @@ class ClientAdminController extends AbstractController
                 return $this->json(['message' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
             }
 
-            $clients = $this->entityManager->getRepository(User::class)->findAll();
+            $clients = $this->entityManager->getRepository(User::class)->findAllUsers();
+            $unreadClientsCount = $this->entityManager->getRepository(User::class)->unreadClientsCount();
 
             $dataClients = $this->userService->getDataService($clients, $serializer);
 
-            return $this->json($dataClients, Response::HTTP_OK);
+            return $this->json([
+                'clients' => $dataClients,
+                'count' => (int) $unreadClientsCount
+            ], Response::HTTP_OK);
         } catch (\Throwable $e) {
             $this->logger->error('Erreur de la récupérartion des utilisateurs', [$e->getMessage()]);
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -77,7 +81,6 @@ class ClientAdminController extends AbstractController
         }
     }
 
-
     #[Route('/is-visible/{id}', methods: ['PATCH'])]
     public function isVisible(int $id): JsonResponse
     {
@@ -109,6 +112,31 @@ class ClientAdminController extends AbstractController
         }
     }
 
+    #[Route('/is-read/{id}', methods: ['PATCH'])]
+    public function isRead(int $id): JsonResponse
+    {
+        try {
+            $user = $this->getUser();
+
+            if (!$user) {
+                return $this->json(['message' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
+            }
+
+            $client = $this->entityManager->getRepository(User::class)->find($id);
+
+            if (!$client) {
+                return $this->json(['message' => 'Client introuvable'], Response::HTTP_NOT_FOUND);
+            }
+
+            $client->setIsRead(true);
+            $this->entityManager->flush();
+
+            return $this->json(['success' => true], Response::HTTP_OK);
+        } catch (\Throwable $e) {
+            $this->logger->error('Erreur sur la vue d\'un utulisateur : ', [$e->getMessage()]);
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 
     #[Route('/remove/{id}', methods: ['DELETE'])]
     public function show(int $id): JsonResponse
