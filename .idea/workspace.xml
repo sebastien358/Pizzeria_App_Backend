@@ -6,9 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="ddaf4521-9ec5-4a69-80e9-26fd216d435a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/Admin/ClientAdminController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/Admin/ClientAdminController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Entity/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Entity/User.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Repository/UserRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/UserRepository.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/User/PaymentController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/User/PaymentController.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -288,6 +286,7 @@
       <workItem from="1780743390625" duration="12700000" />
       <workItem from="1780924345767" duration="9519000" />
       <workItem from="1781001124120" duration="6835000" />
+      <workItem from="1781171703077" duration="3692000" />
     </task>
     <servers />
   </component>
@@ -306,6 +305,11 @@
           <url>file://$PROJECT_DIR$/src/Repository/ContactRepository.php</url>
           <line>4</line>
           <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="php">
+          <url>file://$PROJECT_DIR$/src/Controller/User/PaymentController.php</url>
+          <line>4</line>
+          <option name="timeStamp" value="3" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
