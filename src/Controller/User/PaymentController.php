@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_USER')]
@@ -21,12 +22,7 @@ final class PaymentController extends AbstractController
     private EntityManagerInterface $entityManager;
     private MailerProvider $mailerProvider;
 
-    public function __construct(
-        string $keyPrivate,
-        LoggerInterface $logger,
-        EntityManagerInterface $entityManager,
-        MailerProvider $mailerProvider
-    ) {
+    public function __construct(string $keyPrivate, LoggerInterface $logger, EntityManagerInterface $entityManager, MailerProvider $mailerProvider) {
         $this->keyPrivate = $keyPrivate;
         $this->logger = $logger;
         $this->entityManager = $entityManager;
@@ -64,11 +60,7 @@ final class PaymentController extends AbstractController
                 return $this->json(['error' => 'Command introuvable'], Response::HTTP_NOT_FOUND);
             }
 
-            $totalAmount = 0;
-
-            $totalAmount = $command->getTotal();
-
-            dd($totalAmount);
+            $totalAmount = (int) $command->getTotal();
 
             // Montant en centimes pour Stripe
 
@@ -98,24 +90,7 @@ final class PaymentController extends AbstractController
 
                 $this->entityManager->flush();
 
-                if ($profileId) {
-                    $params = [
-                        'firstname' => $command->getFirstName(),
-                        'lastname' => $command->getLastName(),
-                        'commandItems' => $command->getCommandItems(),
-                        'totalAmount' => $totalAmount
-                    ];
-                } else {
-                    $params = [
-                        'firstname' => $command->getFirstName(),
-                        'lastname' => $command->getLastName(),
-                        'commandItems' => $command->getCommandItems(),
-                        'totalAmount' => $totalAmount
-                    ];
-                }
-
-                $body = $this->render('emails/payment.html.twig', $params)->getContent();
-                $this->mailerProvider->sendEmail($user->getEmail(), 'Vous avez passé une commande', $body);
+                $this->sendConfirmationEmail($profileId, $command, $totalAmount, $user);
 
                 return $this->json([
                     'type' => 'SUCCESS_PAYMENT',
@@ -128,7 +103,6 @@ final class PaymentController extends AbstractController
                     'message' => 'Une erreur est survenue'
                 ], Response::HTTP_CONFLICT);
             }
-
         } catch (\Stripe\Exception\ApiErrorException $e) {
             $this->logger->error('Erreur Stripe : ' . $e->getMessage());
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -136,5 +110,27 @@ final class PaymentController extends AbstractController
             $this->logger->error('Erreur serveur : ' . $e->getMessage());
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public function sendConfirmationEmail(int $profileId, Command $command, float $totalAmount, UserInterface $user): void
+    {
+        if ($profileId) {
+            $params = [
+                'firstname' => $command->getFirstName(),
+                'lastname' => $command->getLastName(),
+                'commandItems' => $command->getCommandItems(),
+                'totalAmount' => $totalAmount
+            ];
+        } else {
+            $params = [
+                'firstname' => $command->getFirstName(),
+                'lastname' => $command->getLastName(),
+                'commandItems' => $command->getCommandItems(),
+                'totalAmount' => $totalAmount
+            ];
+        }
+
+        $body = $this->render('emails/payment.html.twig', $params)->getContent();
+        $this->mailerProvider->sendEmail($user->getEmail(), 'Vous avez passé une commande', $body);
     }
 }
