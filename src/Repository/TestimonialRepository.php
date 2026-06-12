@@ -63,6 +63,8 @@ class TestimonialRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('t')
             ->select('COUNT(t.id)')
+            ->where('t.isPublished = :isPublished')
+            ->setParameter('isPublished', true)
             ->getQuery()
             ->getSingleScalarResult();
     }
