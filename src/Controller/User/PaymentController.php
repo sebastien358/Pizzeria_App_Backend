@@ -76,18 +76,14 @@ final class PaymentController extends AbstractController
                 ],
                 'payment_method_types' => ['card'],
                 'confirm' => true,
+                'return_url' => $this->getParameter('frontend_url') . '/finish'
             ]);
 
             if ($paymentIntent->status === 'succeeded') {
 
                 // Mettre à jour le statut de la commande
 
-                if (isset($command)) {
-                    $command->setStatus(Command::STATUS_PAID);
-                }
-
-                // Flush unique pour tout enregistrer
-
+                $command->setStatus(Command::STATUS_PAID);
                 $this->entityManager->flush();
 
                 $this->sendConfirmationEmail($profileId, $command, $totalAmount, $user);
@@ -97,6 +93,12 @@ final class PaymentController extends AbstractController
                     'message' => 'Paiement accepté',
                 ], Response::HTTP_CREATED);
 
+            } elseif ($paymentIntent->status === 'requires_action') {
+                // Cas 3DS : on renvoie au front pour qu'il gère
+                return $this->json([
+                    'type' => 'REQUIRES_ACTION',
+                    'clientSecret' => $paymentIntent->client_secret
+                ], Response::HTTP_OK);
             } else {
                 return $this->json([
                     'type' => 'ERROR_PAYMENT',
@@ -112,7 +114,7 @@ final class PaymentController extends AbstractController
         }
     }
 
-    public function sendConfirmationEmail(int $profileId, Command $command, float $totalAmount, UserInterface $user): void
+    public function sendConfirmationEmail(?int $profileId, Command $command, float $totalAmount, UserInterface $user): void
     {
         if ($profileId) {
             $params = [
