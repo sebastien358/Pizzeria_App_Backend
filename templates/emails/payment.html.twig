@@ -9,15 +9,11 @@
             <p>Commande en ligne</p>
         </div>
         <div class="email-body">
-            {% if firstname is defined and lastname is defined %}
-                <p>Bonjour {{ firstname }} {{ lastname }},</p>
-            {% else %}
-                <p>Bonjour,</p>
-            {% endif %}
+            <p>Bonjour {{ firstname }} {{ lastname }},</p>
             <p>Merci d'avoir passé commande chez nous !</p>
             <h2>Détails de votre commande :</h2>
             <ul>
-                {% for item in (commandItems is defined ? commandItems : items) %}
+                {% for item in commandItems %}
                     <li>{{ item.product.title }} (x{{ item.quantity }}) : {{ (item.price * item.quantity)|number_format(2, '.', ',') }} €</li>
                 {% endfor %}
             </ul>
