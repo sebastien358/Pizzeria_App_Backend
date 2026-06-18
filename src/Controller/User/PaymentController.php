@@ -29,10 +29,10 @@ final class PaymentController extends AbstractController
     public function payment(Request $request): JsonResponse
     {
         try {
-            $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
+           $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
             $token = $data['token'] ?? null;
-            $commandId = $data['pendingId'] ?? $data['commandId'] ?? null;
+            $commandId = $data['pendingId'] ?? $data['profileId'] ?? null;
 
             if (!$token || !$commandId) {
                 return $this->json(['error' => 'Token et commandId requis'], Response::HTTP_BAD_REQUEST);
@@ -56,7 +56,19 @@ final class PaymentController extends AbstractController
                 ], Response::HTTP_CONFLICT);
             }
 
-            $totalAmountCents = (int) round($command->getTotal() * 100);
+            $itemsTotal = 0;
+            foreach ($command->getCommandItems() as $item) {
+                $itemsTotal += $item->getPrice() * $item->getQuantity();
+            }
+
+            if (abs($itemsTotal - $command->getTotal()) > 0.01) {
+                return $this->json([
+                    'type' => 'PRICE_MISMATCH',
+                    'message' => 'Le montant de votre commande a changé.'
+                ], Response::HTTP_CONFLICT);
+            }
+
+            $totalAmountCents = (int) round($itemsTotal * 100);
 
             if ($totalAmountCents <= 0) {
                 return $this->json(['error' => 'Montant invalide'], Response::HTTP_BAD_REQUEST);
@@ -104,10 +116,10 @@ final class PaymentController extends AbstractController
 
         } catch (ApiErrorException $e) {
             $this->logger->error('Stripe: ' . $e->getMessage(), ['exception' => $e]);
-            return $this->json(['error' => 'Paiement refusé par la banque'], Response::HTTP_BAD_REQUEST);
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         } catch (\Throwable $e) {
             $this->logger->error('Serveur: ' . $e->getMessage(), ['exception' => $e]);
-            return $this->json(['error' => 'Erreur serveur'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
