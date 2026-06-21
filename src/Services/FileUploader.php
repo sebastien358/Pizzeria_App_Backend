@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FileUploader
 {
-    private $targetDirectory;
+    private string $targetDirectory;
     private EntityManagerInterface $entityManager;
 
     public function __construct(string $targetDirectory, EntityManagerInterface $entityManager)
@@ -18,9 +18,9 @@ class FileUploader
 
     public function upload(UploadedFile $file)
     {
-        $fileName = md5(uniqid()) . '.' . $file->guessExtension();
-        $file->move($this->targetDirectory, $fileName);
-        return $fileName;
+        $filename = uniqid() . '.' . $file->guessExtension();
+        $file->move($this->targetDirectory, $filename);
+        return $filename;
     }
 
     public function removeProductAdminImage($imageCurrent)
