@@ -192,6 +192,42 @@ class ProductAdminController extends AbstractController
         }
     }
 
+    #[Route('/product/{id}/upload-image', methods: ['POST'])]
+    public function upload(int $id, Request $request): JsonResponse
+    {
+        try {
+            $user = $this->getUser();
+
+            if (!$user) {
+                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
+            }
+
+            $product = $this->entityManager->getRepository(Product::class)->find($id);
+
+
+            if (!$product) {
+                return $this->json(['error' => 'Produit introuvable'], Response::HTTP_NOT_FOUND);
+            }
+
+            $form = $this->createForm(ProductType::class, $product);
+
+            $data = $request->request->all();
+            $form->submit($data, false);
+
+            if (!$form->isValid()) {
+                $errors = $this->getErrorMessages($form);
+                return $this->json($errors, Response::HTTP_BAD_REQUEST);
+            }
+
+            $this->productService->handleUploadImage($request, $product);
+            $this->entityManager->flush();
+
+            return $this->json(['message' => 'L\'image a été modifié'], Response::HTTP_OK);
+        } catch (\Throwable $e) {
+            $this->logger->error('Erreur, l\'imlage n\'a pas été modifiée', [$e->getMessage()]);
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 
     #[Route('/product/delete/{id}', methods: ['DELETE'])]
     public function deleteProduct(int $id): JsonResponse
@@ -251,7 +287,7 @@ class ProductAdminController extends AbstractController
             $this->fileUploader->removeProductAdminImage($imageCurrent);
             $this->entityManager->flush();
 
-            return $this->json(['message' => 'success delete product'], Response::HTTP_OK);
+            return $this->json(['message' => 'Delete image product'], Response::HTTP_OK);
         } catch (\Throwable $e) {
             $this->logger->error('error recovery products', [$e->getMessage()]);
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);

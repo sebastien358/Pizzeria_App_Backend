@@ -81,4 +81,23 @@ class ProductService
 
         }
     }
+
+    public function handleUploadImage($request, $product)
+    {
+        $image = $request->files->get('image');
+
+        if (!$image) return;
+
+        if ($image->getSize() > 5 * 1024 * 1024) {
+            throw new \Exception('L\'image est trop grande'. $image->getClientOriginalName());
+        }
+        $filename = $this->fileUploader->upload($image);
+
+        $picture = new Picture();
+
+        $picture->setFilename($filename);
+        $picture->setProduct($product);
+
+        $this->entityManager->persist($picture);
+    }
 }
