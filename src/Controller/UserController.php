@@ -39,19 +39,16 @@ final class UserController extends AbstractController
             $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
             $email = $data['email'] ?? null;
-            if (!$email) {
-                return new JsonResponse(['error' => 'user no exists'], Response::HTTP_NOT_FOUND);
+            if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                return $this->json(['error' => 'Email manquant ou invalide.'], Response::HTTP_BAD_REQUEST);
             }
 
-            $emailExists = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
-            if ($emailExists) {
-                return new JsonResponse(['exists' => true, 'message' => 'Email already exists'], Response::HTTP_ACCEPTED);
-            } else {
-                return new JsonResponse(['exists' => false, 'message' => 'Email does not exist'], Response::HTTP_ACCEPTED);
-            }
+            $emailExists = (boolean) $this->entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
+
+            return $this->json(['exists' => $emailExists], Response::HTTP_OK);
         } catch (\Throwable $e) {
             $this->logger->error('Error email existing user', ['error' => $e->getMessage()]);
-            return new JsonResponse(['message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->json(['message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
