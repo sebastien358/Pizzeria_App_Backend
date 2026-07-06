@@ -192,6 +192,7 @@ class ProductAdminController extends AbstractController
         }
     }
 
+<<<<<<< HEAD
     #[Route('/product/{productId}/upload-image', methods: ['POST'])]
     public function upload(int $productId, Request $request): JsonResponse
     {
@@ -228,6 +229,8 @@ class ProductAdminController extends AbstractController
         }
     }
 
+=======
+>>>>>>> d30cb0dc01209df4f86b58dd3744e8dcf5675e12
     #[Route('/product/delete/{id}', methods: ['DELETE'])]
     public function deleteProduct(int $id): JsonResponse
     {
@@ -289,6 +292,42 @@ class ProductAdminController extends AbstractController
             return $this->json(['message' => 'Delete image product'], Response::HTTP_OK);
         } catch (\Throwable $e) {
             $this->logger->error('error recovery products', [$e->getMessage()]);
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    #[Route('/product/{productId}/upload-image', methods: ['POST'])]
+    public function upload(int $productId, Request $request): JsonResponse
+    {
+        try {
+            $user = $this->getUser();
+            if (!$user) {
+                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
+            }
+
+            $product = $this->entityManager->getRepository(Product::class)->find($productId);
+            if (!$product) {
+                return $this->json(['error' => 'Product not found'], Response::HTTP_NOT_FOUND);
+            }
+
+            $form = $this->createForm(ProductType::class, $product);
+
+            $data = $request->request->all();
+            $form->submit($data, false);
+
+            if (!$form->isValid()) {
+                $errors = $this->getErrorMessages($form);
+                return $this->json($errors, Response::HTTP_BAD_REQUEST);
+            }
+
+            $this->productService->handleUploadImage($request, $product);
+
+            $this->entityManager->persist($product);
+            $this->entityManager->flush();
+
+            return $this->json(['message' => 'Upload image product'], Response::HTTP_OK);
+        } catch(\Throwable $e) {
+            $this->logger->error('error uploading image', [$e->getMessage()]);
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
