@@ -65,6 +65,32 @@ class TestimonialAdminController extends AbstractController
         }
     }
 
+    #[Route('/search', methods: ['GET'])]
+    public function search(Request $request, SerializerInterface $serializer): JsonResponse
+    {
+        try {
+            $user = $this->getUser();
+
+            if (!$user) {
+                return $this->json(['message' => 'Utlisateur introuvable'], Response::HTTP_UNAUTHORIZED);
+            }
+
+            $search = (string) $request->query->get('search');
+
+            if (!$search) {
+                return $this->json(['error' => 'Donneés manquantes'], Response::HTTP_BAD_REQUEST);
+            }
+
+            $testimonials = $this->entityManager->getRepository(Testimonial::class)->findAllTestimonialSearch($search);
+            $dataTestimonials = $this->testimonialService->getTestimonialData($request, $testimonials, $serializer);
+
+            return $this->json($dataTestimonials, Response::HTTP_OK);
+        } catch(\Throwable $e) {
+            $this->logger->error('Erreur de la récupération des témoignages', [$e->getMessage()]);
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     #[Route('/lazy-load', methods: ['GET'])]
     public function load(Request $request, SerializerInterface $serializer): JsonResponse
     {

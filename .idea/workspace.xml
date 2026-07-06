@@ -5,12 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ddaf4521-9ec5-4a69-80e9-26fd216d435a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/public/images/6a38612ed2186.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/images/6a38621cf1942.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/images/6a38622bb287b.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/EventListener/AuthenticationSuccessListener.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/packages/nelmio_cors.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/packages/nelmio_cors.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/services.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/services.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/images/6a38612ed2186.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/images/6a38621cf1942.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/images/6a38622bb287b.jpg" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Controller/Admin/ProductAdminController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/Admin/ProductAdminController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Services/FileUploader.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Services/FileUploader.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/Admin/TestimonialAdminController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/Admin/TestimonialAdminController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/ContactController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/ContactController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/HomeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/HomeController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Repository/TestimonialRepository.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Repository/TestimonialRepository.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Services/ProductService.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Services/ProductService.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -26,6 +32,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="HTML File" />
+        <option value="PHP File" />
       </list>
     </option>
   </component>
@@ -298,6 +305,17 @@
       <workItem from="1781954642867" duration="4628000" />
       <workItem from="1782040014382" duration="2820000" />
       <workItem from="1782064565400" duration="4971000" />
+      <workItem from="1782588245391" duration="3163000" />
+      <workItem from="1782641453384" duration="845000" />
+      <workItem from="1782649092446" duration="76000" />
+      <workItem from="1782649186925" duration="6930000" />
+      <workItem from="1782728522713" duration="3309000" />
+      <workItem from="1782815866532" duration="3342000" />
+      <workItem from="1782903550683" duration="9515000" />
+      <workItem from="1783016297615" duration="1486000" />
+      <workItem from="1783100651695" duration="2608000" />
+      <workItem from="1783165387607" duration="24875000" />
+      <workItem from="1783338700355" duration="4353000" />
     </task>
     <servers />
   </component>
@@ -331,6 +349,11 @@
           <url>file://$PROJECT_DIR$/src/Controller/User/PaymentController.php</url>
           <line>48</line>
           <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="php">
+          <url>file://$PROJECT_DIR$/src/Controller/Admin/TestimonialAdminController.php</url>
+          <line>64</line>
+          <option name="timeStamp" value="6" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
