@@ -39,10 +39,16 @@ final class HomeController extends AbstractController
             }
 
             $products = $this->entityManager->getRepository(Product::class)->findAllLoadProducts($offset, $limit);
-
             $dataProducts = $this->productService->getProductData($request, $products, $serializer);
 
-            return $this->json($dataProducts, Response::HTTP_OK);
+            $countProduct = $this->entityManager->getRepository(Product::class)->findAllCountProducts();
+
+            return $this->json([
+                'products' => $dataProducts,
+                'countProduct' => (int) $countProduct
+            ],
+                Response::HTTP_OK
+            );
         } catch (\Throwable $e) {
             $this->logger->error('Erreur de la récupération de la liste des produits', [$e->getMessage()]);
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);

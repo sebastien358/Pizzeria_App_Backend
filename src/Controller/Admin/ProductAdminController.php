@@ -58,13 +58,13 @@ class ProductAdminController extends AbstractController
                 return $this->json(['error' => 'Pas de produit'], Response::HTTP_BAD_REQUEST);
             }
 
-            $total = $this->entityManager->getRepository(Product::class)->findAllCountProducts();
+            $totalProducts = $this->entityManager->getRepository(Product::class)->findAllCountProducts();
             $dataProducts = $this->productService->getProductData($request, $products, $serializer);
 
             return $this->json([
-                'total' => (int) $total,
+                'totalProducts' => (int) $totalProducts,
                 'products' => $dataProducts,
-                'pages' => ceil($total / $limit),
+                'pages' => ceil($totalProducts / $limit),
             ], Response::HTTP_OK);
         } catch(\Throwable $e) {
             $this->logger->error('Error récupération des produits', [$e->getMessage()]);
@@ -97,7 +97,7 @@ class ProductAdminController extends AbstractController
         }
     }
 
-    #[Route('/product/current/{id}', methods: ['GET'])]
+    #[Route('/product/{id}', methods: ['GET'])]
     public function current(int $id, Request $request, SerializerInterface $serializer): JsonResponse
     {
         try {
@@ -122,7 +122,7 @@ class ProductAdminController extends AbstractController
         }
     }
 
-    #[Route('/product/add', methods: ['POST'])]
+    #[Route('/product/new', methods: ['POST'])]
     public function addProduct(Request $request): JsonResponse
     {
         try {
@@ -156,8 +156,8 @@ class ProductAdminController extends AbstractController
         }
     }
 
-    #[Route('/product/edit/{id}', methods: ['POST'])]
-    public function edit(int $id, Request $request): JsonResponse
+    #[Route('/product/{productId}/edit', methods: ['POST'])]
+    public function edit(int $productId, Request $request): JsonResponse
     {
         try {
             $user = $this->getUser();
@@ -166,7 +166,7 @@ class ProductAdminController extends AbstractController
                 return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
             }
 
-            $product = $this->entityManager->getRepository(Product::class)->find($id);
+            $product = $this->entityManager->getRepository(Product::class)->find($productId);
 
             if (!$product) {
                 return $this->json(['error' => 'Produit introuvable'], Response::HTTP_NOT_FOUND);
@@ -192,8 +192,8 @@ class ProductAdminController extends AbstractController
         }
     }
 
-    #[Route('/product/{id}/upload-image', methods: ['POST'])]
-    public function upload(int $id, Request $request): JsonResponse
+    #[Route('/product/{productId}/upload-image', methods: ['POST'])]
+    public function upload(int $productId, Request $request): JsonResponse
     {
         try {
             $user = $this->getUser();
@@ -202,8 +202,7 @@ class ProductAdminController extends AbstractController
                 return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
             }
 
-            $product = $this->entityManager->getRepository(Product::class)->find($id);
-
+            $product = $this->entityManager->getRepository(Product::class)->find($productId);
 
             if (!$product) {
                 return $this->json(['error' => 'Produit introuvable'], Response::HTTP_NOT_FOUND);
@@ -239,7 +238,7 @@ class ProductAdminController extends AbstractController
             }
 
             $product = $this->entityManager->getRepository(Product::class)->find($id);
-            if (empty($product)) {
+            if (!$product) {
                 return $this->json(['error' => 'Product not found'], Response::HTTP_NOT_FOUND);
             }
 
@@ -290,6 +289,42 @@ class ProductAdminController extends AbstractController
             return $this->json(['message' => 'Delete image product'], Response::HTTP_OK);
         } catch (\Throwable $e) {
             $this->logger->error('error recovery products', [$e->getMessage()]);
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    #[Route('/product/{productId}/upload-image', methods: ['POST'])]
+    public function upload(int $productId, Request $request): JsonResponse
+    {
+        try {
+            $user = $this->getUser();
+            if (!$user) {
+                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
+            }
+
+            $product = $this->entityManager->getRepository(Product::class)->find($productId);
+            if (!$product) {
+                return $this->json(['error' => 'Product not found'], Response::HTTP_NOT_FOUND);
+            }
+
+            $form = $this->createForm(ProductType::class, $product);
+
+            $data = $request->request->all();
+            $form->submit($data, false);
+
+            if (!$form->isValid()) {
+                $errors = $this->getErrorMessages($form);
+                return $this->json($errors, Response::HTTP_BAD_REQUEST);
+            }
+
+            $this->productService->handleUploadImage($request, $product);
+
+            $this->entityManager->persist($product);
+            $this->entityManager->flush();
+
+            return $this->json(['message' => 'Upload image product'], Response::HTTP_OK);
+        } catch(\Throwable $e) {
+            $this->logger->error('error uploading image', [$e->getMessage()]);
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

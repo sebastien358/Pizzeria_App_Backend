@@ -61,30 +61,29 @@ class ProductService
 
     public function handleProductImages($request, $product)
     {
-        $images = $request->files->get('images');
+        $image = $request->files->get('image');
 
-        if (!$images) return;
+        if (!$image) return;
 
-        foreach ($images as $image) {
-            if ($image->getSize() > 5 * 1024 * 1024) {
-                throw new \Exception('La taille de l\'image est trop grande'. $image->getClientOriginalName());
-            }
-
-            $filename = $this->fileUploader->upload($image);
-
-            $picture = new Picture();
-
-            $picture->setFilename($filename);
-            $picture->setProduct($product);
-
-            $this->entityManager->persist($picture);
-
+        if ($image->getSize() > 5 * 1024 * 1024) {
+            throw new \Exception('La taille de l\'image est trop grande'. $image->getClientOriginalName());
         }
+
+        $filename = $this->fileUploader->upload($image);
+
+        $picture = new Picture();
+
+        $picture->setFilename($filename);
+        $picture->setProduct($product);
+
+        $this->entityManager->persist($picture);
     }
 
     public function handleUploadImage($request, $product)
     {
         $image = $request->files->get('image');
+
+        //dd($image);
 
         if (!$image) return;
 
