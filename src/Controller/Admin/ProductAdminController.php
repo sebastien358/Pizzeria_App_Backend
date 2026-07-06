@@ -192,7 +192,6 @@ class ProductAdminController extends AbstractController
         }
     }
 
-<<<<<<< HEAD
     #[Route('/product/{productId}/upload-image', methods: ['POST'])]
     public function upload(int $productId, Request $request): JsonResponse
     {
@@ -229,8 +228,6 @@ class ProductAdminController extends AbstractController
         }
     }
 
-=======
->>>>>>> d30cb0dc01209df4f86b58dd3744e8dcf5675e12
     #[Route('/product/delete/{id}', methods: ['DELETE'])]
     public function deleteProduct(int $id): JsonResponse
     {
