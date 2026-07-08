@@ -117,7 +117,7 @@ class CommandAdminController extends AbstractController
         }
     }
 
-    #[Route('/{id}/preparation/{preparationStatus}', methods: ['GET'])]
+    #[Route('/{id}/preparation/{preparationStatus}', methods: ['PATCH'])]
     public function preparation(int $id, string $preparationStatus): JsonResponse
     {
         try {
@@ -143,8 +143,8 @@ class CommandAdminController extends AbstractController
         }
     }
 
-    #[Route('/delete/{id}', methods: ['DELETE'])]
-    public function delete(int $id): JsonResponse
+    #[Route('/delete/{commandId}', methods: ['DELETE'])]
+    public function delete(int $commandId): JsonResponse
     {
         try {
             $user = $this->getUser();
@@ -153,7 +153,7 @@ class CommandAdminController extends AbstractController
                 return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
             }
 
-            $command = $this->entityManager->getRepository(Command::class)->find($id);
+            $command = $this->entityManager->getRepository(Command::class)->find($commandId);
 
             if (!$command) {
                 return $this->json(['error' => 'Command introuvable'], Response::HTTP_BAD_REQUEST);

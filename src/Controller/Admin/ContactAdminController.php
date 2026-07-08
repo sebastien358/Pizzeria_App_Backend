@@ -54,7 +54,6 @@ class ContactAdminController extends AbstractController
             $countContactsUnread =  $this->entityManager->getRepository(Contact::class)->countContactsUnread();
 
             return $this->json([
-                'total' => (int) $totalContacts,
                 'contacts' => $dataContacts,
                 'totalContacts' => (int) $totalContacts,
                 'countContactsUnread' => (int) $countContactsUnread,
@@ -62,7 +61,7 @@ class ContactAdminController extends AbstractController
             ], Response::HTTP_OK);
         } catch(\Throwable $e) {
             $this->logger->error('Impossible de récupérer la liste des messages', ['error' => $e->getMessage()]);
-            return $this->json(['error' => 'Impossible de récupérer la liste des messages'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->json(['error' => [$e->getMessage()]], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
