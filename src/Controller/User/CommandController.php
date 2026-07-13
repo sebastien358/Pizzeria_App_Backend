@@ -52,18 +52,18 @@ final class CommandController extends AbstractController
                 return $this->json(['error' => 'Données manquantes ou invalides'], Response::HTTP_BAD_REQUEST);
             }
 
-            $commands = $this->entityManager->getRepository(Command::class)->findAllCommandByClient($user, $page, $limit);
+            $commands = $this->entityManager->getRepository(Command::class)->    findAllCommandByClient($user, $page, $limit);
 
             $dataCommands = $this->commandService->getCommandData($request, $commands, $serializer);
 
-            $total = $this->entityManager->getRepository(Command::class)->findAllCountCommand($user);
+            $totalCommands = $this->entityManager->getRepository(Command::class)->findAllCountCommand($user);
             $countCommandUserPending = $this->entityManager->getRepository(Command::class)->countCommandUserPending($user);
 
             return $this->json([
                 'commands' => $dataCommands,
                 'countCommandPending' => (int) $countCommandUserPending,
-                'total' => $total ?? 0,
-                'pages' => $limit > 0 ? ceil(($total ?? 0) / $limit) : 1
+                'totalCommand' => $totalCommands ?? 0,
+                'pages' => ceil($totalCommands / $limit),
             ], Response::HTTP_OK);
 
         } catch (\Throwable $e) {
@@ -103,7 +103,7 @@ final class CommandController extends AbstractController
 
     // Passer une commande utilidateur
 
-    #[Route('/add', methods: ['POST'])]
+    #[Route('/user/add', methods: ['POST'])]
     public function add(Request $request): JsonResponse
     {
         try {
@@ -143,7 +143,7 @@ final class CommandController extends AbstractController
                 $commandItems = new CommandItems();
                 $commandItems->setProduct($product);
                 $commandItems->setTitle($cartItem['title']);
-                $commandItems->setPrice($cartItem['price']);
+                $commandItems->setPrice($cartItem['productOption']['price']);
                 $commandItems->setQuantity($cartItem['quantity']);
                 $command->addCommandItem($commandItems);
                 $total += $commandItems->getPrice() * $commandItems->getQuantity();
@@ -170,7 +170,7 @@ final class CommandController extends AbstractController
         }
     }
 
-    #[Route('/delete/{id}', methods: ['DELETE'])]
+    #[Route('/user/delete/{id}', methods: ['DELETE'])]
     public function delete(Command $command): JsonResponse
     {
         try {
