@@ -58,14 +58,14 @@ final class UserController extends AbstractController
         try {
             $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
-            if (empty($data['email'])) {
+            if (!$data['email']) {
                 return $this->json(['error' => 'Email requis'], Response::HTTP_BAD_REQUEST);
             }
 
             $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $data['email']]);
 
             if (!$user) {
-                return $this->json(['type' => 'REQUEST-PASSWORD', 'message' => 'Aucun compte n\'existe avec cet email'], Response::HTTP_CONFLICT);
+                return $this->json(['type' => 'ERROR-REQUEST-PASSWORD', 'message' => 'Aucun compte n\'existe avec cet email'], Response::HTTP_CONFLICT);
             }
 
             $token = bin2hex(random_bytes(32));
@@ -101,12 +101,12 @@ final class UserController extends AbstractController
                 return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_BAD_REQUEST);
             }
 
+            if ($user->getResetTokenExpiresAt() < new \DateTimeImmutable()) {
+                return $this->json(['type' => 'ERROR-RESET-PASSWORD', 'message' => 'Votre demande a expirée'], Response::HTTP_CONFLICT);
+            }
+
             $newPassword = $this->passwordHasher->hashPassword($user, $data['password']);
             $user->setPassword($newPassword);
-
-            if ($user->getResetTokenExpiresAt() < new \DateTimeImmutable()) {
-                return $this->json(['type' => 'RESET-PASSWORD', 'message' => 'Votre demande a expirée'], Response::HTTP_CONFLICT);
-            }
 
             $user->setResetToken(null);
             $user->setResetTokenExpiresAt(null);

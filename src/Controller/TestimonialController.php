@@ -72,7 +72,7 @@ final class TestimonialController extends AbstractController
                 'testimonials' => $dataTestimonials,
                 'countTestimonials' => (int) $countTestimonials,
                 'pages' => ceil($countTestimonials / $limit),
-                'averageRating' => round($average, 1), // <- ajoute ça
+                'averageRating' => round($average, 1)
             ], Response::HTTP_OK);
         } catch(\Throwable $exception) {
             $this->logger->error('Erreur de la récupération des témoignages : ', [$exception->getMessage()]);
