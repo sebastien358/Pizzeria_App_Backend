@@ -20,8 +20,8 @@ class TestimonialRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('t')
             ->orderBy('t.createdAt', 'DESC')
-           // ->where('t.isPublished = :isPublished')
-            ///->setParameter('isPublished', true)
+            ->where('t.isPublished = :isPublished')
+            ->setParameter('isPublished', true)
             ->setFirstResult(($currentPage - 1) * $limit)
             ->setMaxResults($limit)
             ->getQuery()
@@ -73,8 +73,8 @@ class TestimonialRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('t')
             ->select('COUNT(t.id)')
-//            ->where('t.isPublished = :isPublished')
-//            ->setParameter('isPublished', true)
+            ->where('t.isPublished = :isPublished')
+            ->setParameter('isPublished', true)
             ->getQuery()
             ->getSingleScalarResult();
     }

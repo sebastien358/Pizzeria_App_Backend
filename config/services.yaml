@@ -6,6 +6,7 @@
 parameters:
     image_directory: '%kernel.project_dir%/public/images'
     frontend_url: 'https://www.pizzeria.sebastien-petit.fr'
+    #frontend_url: 'http://localhost:3000'
     mail_from: '%env(EMAIL_FROM)%'
     key_private: '%env(STRIPE_SECRET_KEY)%'
 
