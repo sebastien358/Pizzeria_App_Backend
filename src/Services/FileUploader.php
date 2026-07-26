@@ -38,13 +38,13 @@ class FileUploader
     {
         if (!$images) return;
 
-        foreach ($images as $picture) {
-            $fileName = $this->targetDirectory . '/' . $picture->getFileName();
-            if (file_exists($fileName)) {
-                unlink($fileName);
+        foreach ($images as $image) {
+            $fileExist = $this->targetDirectory . '/' . $image->getFileName();
+            if (file_exists($fileExist)) {
+                unlink($fileExist);
             }
 
-            $this->entityManager->remove($picture);
+            $this->entityManager->remove($image);
         }
     }
 

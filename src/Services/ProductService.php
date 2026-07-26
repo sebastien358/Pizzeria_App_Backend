@@ -83,8 +83,6 @@ class ProductService
     {
         $image = $request->files->get('image');
 
-        //dd($image);
-
         if (!$image) return;
 
         if ($image->getSize() > 5 * 1024 * 1024) {

@@ -76,7 +76,7 @@ class UserAccountController extends AbstractController
 
             $userExist = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $data['email']]);
             if (!$userExist) {
-                return $this->json(['type' => 'ACCOUNT_EDIT_USER', 'message' => 'Aucun compte n\'existe avec cet email'], Response::HTTP_CONFLICT);
+                return $this->json(['type' => 'ACCOUNT_ERROR_EDIT_USER', 'message' => 'Aucun compte n\'existe avec cet email'], Response::HTTP_CONFLICT);
             }
 
             $user = $this->getUser();
@@ -93,7 +93,7 @@ class UserAccountController extends AbstractController
                 return $this->json($errors, Response::HTTP_BAD_REQUEST);
             }
 
-            if (!empty($data['password'])) {
+            if ($data['password']) {
                 $newPassword = $this->passwordHasher->hashPassword($user, $data['password']);
                 $user->setPassword($newPassword);
             }

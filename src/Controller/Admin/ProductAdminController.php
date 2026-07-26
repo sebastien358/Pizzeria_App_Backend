@@ -196,6 +196,7 @@ class ProductAdminController extends AbstractController
     public function upload(int $productId, Request $request): JsonResponse
     {
         try {
+
             $user = $this->getUser();
 
             if (!$user) {
@@ -215,7 +216,7 @@ class ProductAdminController extends AbstractController
 
             if (!$form->isValid()) {
                 $errors = $this->getErrorMessages($form);
-                return $this->json($errors, Response::HTTP_BAD_REQUEST);
+                return $this->json(['error' => $errors], Response::HTTP_BAD_REQUEST);
             }
 
             $this->productService->handleUploadImage($request, $product);
@@ -233,16 +234,17 @@ class ProductAdminController extends AbstractController
     {
         try {
             $user = $this->getUser();
+
             if (!$user) {
-                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_FORBIDDEN);
+                return $this->json('Utilisateur introuvable', Response::HTTP_UNAUTHORIZED);
             }
 
             $product = $this->entityManager->getRepository(Product::class)->find($id);
             if (!$product) {
-                return $this->json(['error' => 'Product not found'], Response::HTTP_NOT_FOUND);
+                return $this->json(['error' => 'Produit introuvable'], Response::HTTP_NOT_FOUND);
             }
 
-            $images = $product->getPictures();
+            $images = $product->getImages();
             $this->fileUploader->removeProductImage($images);
 
             $this->entityManager->remove($product);
@@ -259,34 +261,30 @@ class ProductAdminController extends AbstractController
     public function deleteImage(int $productId, int $imageId): JsonResponse
     {
         try {
-            $user = $this->getUser();
+                $user = $this->getUser();
+                if (!$user) {
+                    return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
+                }
 
-            if (!$user) {
-                return $this->json(['error' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
-            }
+                $product = $this->entityManager->getRepository(Product::class)->find($productId);
+                if (!$product) {
+                    return $this->json(['error' => 'Produit introuvable'], Response::HTTP_NOT_FOUND);
+                }
 
-            $product = $this->entityManager->getRepository(Product::class)->find($productId);
+                $images = $product->getPictures();
 
-            if (empty($product)) {
-                return $this->json(['error' => 'Product not found'], Response::HTTP_BAD_REQUEST);
-            }
-
-            $imageCurrent = null;
-            foreach ($product->getPictures() as $picture) {
-                if ($picture->getId() === $imageId) {
-                    $imageCurrent = $picture;
+                $imageCurrent = 0;
+                foreach ($images as $image) {
+                    if ($image->getId() == $imageId) {
+                        $imageCurrent = $image;
+                    }
                     break;
                 }
-            }
 
-            if (!$imageCurrent) {
-                return $this->json(['error' => 'L\'image ne correspond pas au produit'], Response::HTTP_NOT_FOUND);
-            }
+                $this->fileUploader->removeProductAdminImage($imageCurrent);
+                $this->entityManager->flush();
 
-            $this->fileUploader->removeProductAdminImage($imageCurrent);
-            $this->entityManager->flush();
-
-            return $this->json(['message' => 'Delete image product'], Response::HTTP_OK);
+                return $this->json(['message' => 'Delete image product'], Response::HTTP_OK);
         } catch (\Throwable $e) {
             $this->logger->error('error recovery products', [$e->getMessage()]);
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
