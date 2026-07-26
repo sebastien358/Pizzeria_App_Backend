@@ -37,13 +37,17 @@ final class UserController extends AbstractController
     {
         try {
             $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
-
             $email = $data['email'] ?? null;
+
             if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 return $this->json(['error' => 'Email manquant ou invalide.'], Response::HTTP_BAD_REQUEST);
             }
 
             $emailExists = (boolean) $this->entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
+
+            if (!$emailExists) {
+                return $this->json(['type' => 'ERROR_EMAIL_EXISTING', 'message' => 'Votre email n\'existe pas dans nos données'], Response::HTTP_BAD_REQUEST);
+            }
 
             return $this->json(['exists' => $emailExists], Response::HTTP_OK);
         } catch (\Throwable $e) {
