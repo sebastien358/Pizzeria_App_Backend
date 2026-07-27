@@ -22,14 +22,12 @@ final class TestimonialController extends AbstractController
 {
     private LoggerInterface $logger;
     private EntityManagerInterface $entityManager;
-    private FileUploader $fileUploader;
     private TestimonialService $testimonialService;
 
-    public function __construct(LoggerInterface $logger, EntityManagerInterface $entityManager, FileUploader $fileUploader, TestimonialService $testimonialService)
+    public function __construct(LoggerInterface $logger, EntityManagerInterface $entityManager, TestimonialService $testimonialService)
     {
         $this->logger = $logger;
         $this->entityManager = $entityManager;
-        $this->fileUploader = $fileUploader;
         $this->testimonialService = $testimonialService;
     }
 
@@ -96,22 +94,9 @@ final class TestimonialController extends AbstractController
                 return $this->json(['error' => $errors], Response::HTTP_BAD_REQUEST);
             }
 
-            $images = $request->files->get('images') ?? [];
+            $image = $request->files->get('image');
 
-            foreach ($images as $image) {
-                if ($image->getSize() > 5 * 1024 * 1024) {
-                    throw new \Exception('La taille de l\'image est trop grande'. $image->getClientOriginalName());
-                }
-
-                $picture = new Picture();
-
-                $filename = $this->fileUploader->upload($image);
-
-                $picture->setFilename($filename);
-                $picture->setTestimonial($testimonial);
-
-                $this->entityManager->persist($picture);
-            }
+            $this->testimonialService->handleTestimonialImage($image, $testimonial);
 
             $this->entityManager->persist($testimonial);
             $this->entityManager->flush();
