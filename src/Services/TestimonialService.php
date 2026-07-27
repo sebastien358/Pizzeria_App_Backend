@@ -2,8 +2,20 @@
 
 namespace App\Services;
 
+use App\Entity\Picture;
+use Doctrine\ORM\EntityManagerInterface;
+
 class TestimonialService
 {
+    private EntityManagerInterface $entityManager;
+    private FileUploader $fileUploader;
+
+    public function __construct(EntityManagerInterface $entityManager, FileUploader $fileUploader)
+    {
+        $this->entityManager = $entityManager;
+        $this->fileUploader = $fileUploader;
+    }
+
     public function getTestimonialData($request, $testimonials, $serializer)
     {
         if (is_array($testimonials)) {
@@ -33,5 +45,23 @@ class TestimonialService
 
             return $dataTestimonial;
         }
+    }
+
+    public function handleTestimonialImage($image, $testimonial) {
+
+        if (!$image) return;
+
+        if ($image->getSize() > 5 * 1024 * 1024) {
+            throw new \Exception('La taille de l\'image est trop grande'. $image->getClientOriginalName());
+        }
+
+        $picture = new Picture();
+
+        $filename = $this->fileUploader->upload($image);
+
+        $picture->setFilename($filename);
+        $picture->setTestimonial($testimonial);
+
+        $this->entityManager->persist($picture);
     }
 }
