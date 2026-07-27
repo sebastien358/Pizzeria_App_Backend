@@ -101,7 +101,6 @@ class UserAccountController extends AbstractController
             $this->entityManager->flush();
 
             return $this->json(['message' => 'Données modifiées'], Response::HTTP_OK);
-
         } catch (\Throwable $e) {
             $this->logger->error('Erreur modification : ', ['error' => $e->getMessage()]);
             return $this->json(['message' => 'Erreur serveur'], Response::HTTP_INTERNAL_SERVER_ERROR);
