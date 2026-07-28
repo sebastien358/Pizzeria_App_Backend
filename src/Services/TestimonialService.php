@@ -36,12 +36,19 @@ class TestimonialService
             }
 
             return $dataTestimonials;
+
         } else {
-            $dataTestimonial = $serializer->normalize($testimonials, 'json', ['groups' => ['testimonials', 'pictures'],
-                'circular_reference_handler' => function ($object) {
-                    return $object->getId();
+            $dataTestimonial = $serializer->normalize($testimonials, 'json', ['groups' => ['testimonial', 'pictures'], 'circular_reference_handleer' => function ($object) {
+                return $object->getId();
+            }]);
+
+            $urlImage = $request->getSchemeAndHttpHost() . '/images/';
+
+            if (isset($dataTestimonial['pictures'])) {
+                foreach ($dataTestimonial['pictures'] as &$picture) {
+                    $picture['url'] = $urlImage . $picture['filename'];
                 }
-            ]);
+            }
 
             return $dataTestimonial;
         }
