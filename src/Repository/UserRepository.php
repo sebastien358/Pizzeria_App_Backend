@@ -33,20 +33,20 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
-    public function findAllUsers()
+    public function findAllUsersPagination(int $currentPage, int $limit)
     {
         return $this->createQueryBuilder('u')
             ->orderBy('u.createdAt', 'DESC')
+            ->setFirstResult(($currentPage - 1) * $limit)
+            ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
     }
 
-    public function unreadClientsCount()
+    public function clientsCount()
     {
         return $this->createQueryBuilder('u')
             ->select('count(u.id)')
-            ->where('u.isRead = :isRead')
-            ->setParameter('isRead', false)
             ->getQuery()
             ->getSingleScalarResult();
     }
