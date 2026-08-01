@@ -29,7 +29,7 @@ class ClientAdminController extends AbstractController
     }
 
     #[Route('/list', methods: ['GET'])]
-    public function index(SerializerInterface $serializer): JsonResponse
+    public function index(Request $request, SerializerInterface $serializer): JsonResponse
     {
         try {
             $user = $this->getUser();
@@ -38,14 +38,18 @@ class ClientAdminController extends AbstractController
                 return $this->json(['message' => 'Utilisateur introuvable'], Response::HTTP_UNAUTHORIZED);
             }
 
-            $clients = $this->entityManager->getRepository(User::class)->findAllUsers();
-            $unreadClientsCount = $this->entityManager->getRepository(User::class)->unreadClientsCount();
+            $currentPage = (int) $request->query->get('currentPage');
+            $limit = (int) $request->query->get('limit');
+
+            $clients = $this->entityManager->getRepository(User::class)->findAllUsersPagination($currentPage, $limit);
+            $clientsCount = $this->entityManager->getRepository(User::class)->clientsCount();
 
             $dataClients = $this->userService->getDataService($clients, $serializer);
 
             return $this->json([
                 'clients' => $dataClients,
-                'count' => (int) $unreadClientsCount
+                'count' => (int) $clientsCount,
+                'pages' => ceil($clientsCount / $limit)
             ], Response::HTTP_OK);
         } catch (\Throwable $e) {
             $this->logger->error('Erreur de la récupérartion des utilisateurs', [$e->getMessage()]);

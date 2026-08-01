@@ -68,6 +68,8 @@ final class PaymentController extends AbstractController
                 ], Response::HTTP_CONFLICT);
             }
 
+            dd($itemsTotal);
+
             $totalAmountCents = (int) round($itemsTotal * 100);
 
             if ($totalAmountCents <= 0) {

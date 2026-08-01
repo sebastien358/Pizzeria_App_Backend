@@ -1,38 +1,50 @@
-## Compte de démonstration pour les recruteurs
+# E-commerce Pizzeria - Fullstack
+
+**Démo en ligne :** [pizzeria.sebastien-petit.fr](https://pizzeria.sebastien-petit.fr)
 
 ## 🎯 Objectif du projet
+Plateforme e-commerce complète développée avec **Symfony + React + Next.js**
+dans le cadre du Titre RNCP Développeur Web et Web Mobile - Niveau 5.
 
-Cette application a pour objectif de démontrer la conception complète d’une plateforme e-commerce moderne développée avec Symfony et Vue.js.
-
-Le projet met en avant :
-
-- Une architecture fullstack complète (frontend + backend)
-- Un système d’authentification sécurisé avec gestion des rôles
-- La gestion des produits, catégories et commandes
-- Un tunnel de commande avec intégration Stripe
-- Une interface responsive pensée pour mobile et desktop
-- Des animations et optimisations UX avec GSAP
-- Une organisation propre du code avec composants réutilisables
-
-L’objectif est de présenter un projet concret, cohérent et exploitable, reproduisant les principales fonctionnalités d’une véritable plateforme de commande en ligne.
+Ce projet démontre :
+- **Architecture Fullstack** : Frontend React/Next.js + Backend API Symfony
+- **Authentification sécurisée** : Gestion des rôles Admin / Client
+- **Gestion complète** : Produits, Catégories, Commandes
+- **Tunnel de commande** : Intégration Stripe
+- **UX/UI** : Interface responsive + Animations GSAP
+- **Code propre** : Composants réutilisables
 
 ## 🔐 Comptes de démonstration
+Pour tester l’application :
 
-Vous pouvez utiliser les comptes suivants pour tester l’application :
+**Admin**
+- Email : `sebastienpetit27330@gmail.com`
+- Mot de passe : `password`
 
-### Admin
-- **Email :** sebastienpetit27330@gmail.com
-- **Mot de passe :** password
-
-### Client
-- **Email :** sebastien.p0027@gmail.com
-- **Mot de passe :** password
+**Client**
+- Email : `sebastien.p0027@gmail.com`
+- Mot de passe : `password`
 
 ## 💳 Carte de test Stripe
+- Numéro : `4242 4242 4242 4242`
+- Expiration : `07/28`
+- CVC : `123`
+- Code postal : `75001`
 
-- **Numéro :** 4242 4242 4242 4242
-- **Expiration :** 07/28
-- **CVC :** 123
-- **Code postal :** 75001
+*Les données sont réinitialisées régulièrement. Usage démo uniquement.*
 
-> Ces comptes sont uniquement destinés à la démonstration. Les modifications effectuées dans l’application sont temporaires.
+## 🛠️ Stack technique
+**Frontend** : React, Next.js, GSAP
+**Backend** : Symfony, API REST, MySQL
+**Paiement** : Stripe
+**Déploiement** : Production
+
+## 🚀 Lancement
+```bash
+# Backend
+composer install
+symfony serve
+
+# Frontend
+npm install
+npm run dev
