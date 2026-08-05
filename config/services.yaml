@@ -8,7 +8,7 @@ parameters:
     frontend_url: 'https://www.pizzeria.sebastien-petit.fr'
     #frontend_url: 'http://localhost:3000'
     mail_from: '%env(EMAIL_FROM)%'
-    key_private: '%env(STRIPE_SECRET_KEY)%'
+    stripe_secret_key: '%env(STRIPE_SECRET_KEY)%'
 
 services:
     # default configuration for services in *this* file
@@ -31,7 +31,7 @@ services:
 
     App\Controller\User\PaymentController:
         arguments:
-            $keyPrivate: '%key_private%'
+            $stripeSecretKey: '%stripe_secret_key%'
 
     App\EventListener\AuthenticationSuccessListener:
         tags:
